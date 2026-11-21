@@ -1,0 +1,2346 @@
+{
+  "version": 1,
+  "episode": "001",
+  "title": "国家是如何形成的？",
+  "subtitle": "从中国历史看，一个国家的诞生",
+  "width": 1080,
+  "height": 1920,
+  "fps": 30,
+  "duration": 419.114,
+  "audio": "episodes/001/narration.wav",
+  "bgm": null,
+  "scenes": [
+    {
+      "id": "S01",
+      "type": "image",
+      "start": 0.0,
+      "image": "episodes/001/images/S01.jpg",
+      "source": "S01",
+      "visual": "时光倒流",
+      "motion": "zoomIn",
+      "chapter": null,
+      "end": 3.826
+    },
+    {
+      "id": "S02",
+      "type": "image",
+      "start": 3.826,
+      "image": "episodes/001/images/S02.jpg",
+      "source": "S02",
+      "visual": "国家的要素与远古荒原",
+      "motion": "panRight",
+      "chapter": null,
+      "end": 13.272
+    },
+    {
+      "id": "S03",
+      "type": "image",
+      "start": 13.272,
+      "image": "episodes/001/images/S03.jpg",
+      "source": "S03",
+      "visual": "从部落到城邦",
+      "motion": "zoomOut",
+      "chapter": null,
+      "end": 22.658
+    },
+    {
+      "id": "S04",
+      "type": "image",
+      "start": 22.658,
+      "image": "episodes/001/images/S04.jpg",
+      "source": "S04",
+      "visual": "一人统治万人",
+      "motion": "panUp",
+      "chapter": null,
+      "end": 31.824
+    },
+    {
+      "id": "S05",
+      "type": "image",
+      "start": 31.824,
+      "image": "episodes/001/images/S05.jpg",
+      "source": "S05",
+      "visual": "走进中国历史",
+      "motion": "panUp",
+      "chapter": null,
+      "end": 36.322
+    },
+    {
+      "id": "C1",
+      "type": "chapter",
+      "start": 36.322,
+      "kicker": "第一阶段",
+      "title": "人类为什么开始组织起来？",
+      "end": 39.978
+    },
+    {
+      "id": "S06",
+      "type": "image",
+      "start": 39.978,
+      "image": "episodes/001/images/S06.jpg",
+      "source": "S06",
+      "visual": "远古狩猎采集",
+      "motion": "zoomIn",
+      "chapter": "第一阶段 · 人类为什么开始组织起来？",
+      "end": 47.202
+    },
+    {
+      "id": "S07",
+      "type": "image",
+      "start": 47.202,
+      "image": "episodes/001/images/S07.jpg",
+      "source": "S07",
+      "visual": "篝火旁的长老",
+      "motion": "panDown",
+      "chapter": "第一阶段 · 人类为什么开始组织起来？",
+      "end": 54.944
+    },
+    {
+      "id": "S08",
+      "type": "image",
+      "start": 54.944,
+      "image": "episodes/001/images/S08.jpg",
+      "source": "S08",
+      "visual": "食物不够了",
+      "motion": "zoomIn",
+      "chapter": "第一阶段 · 人类为什么开始组织起来？",
+      "end": 59.662
+    },
+    {
+      "id": "S09",
+      "type": "image",
+      "start": 59.662,
+      "image": "episodes/001/images/S09.jpg",
+      "source": "S09",
+      "visual": "外敌与野兽",
+      "motion": "panRight",
+      "chapter": "第一阶段 · 人类为什么开始组织起来？",
+      "end": 66.372
+    },
+    {
+      "id": "S10",
+      "type": "image",
+      "start": 66.372,
+      "image": "episodes/001/images/S10.jpg",
+      "source": "S10",
+      "visual": "组织起来",
+      "motion": "zoomOut",
+      "chapter": "第一阶段 · 人类为什么开始组织起来？",
+      "end": 75.382
+    },
+    {
+      "id": "S11",
+      "type": "image",
+      "start": 75.382,
+      "image": "episodes/001/images/S11.jpg",
+      "source": "S11",
+      "visual": "勇者成为首领",
+      "motion": "panLeft",
+      "chapter": "第一阶段 · 人类为什么开始组织起来？",
+      "end": 85.802
+    },
+    {
+      "id": "S12",
+      "type": "image",
+      "start": 85.802,
+      "image": "episodes/001/images/S12.jpg",
+      "source": "S12",
+      "visual": "追随首领",
+      "motion": "panUp",
+      "chapter": "第一阶段 · 人类为什么开始组织起来？",
+      "end": 90.644
+    },
+    {
+      "id": "C2",
+      "type": "chapter",
+      "start": 90.644,
+      "kicker": "第二阶段",
+      "title": "农业革命，让人类不再流动",
+      "end": 94.872
+    },
+    {
+      "id": "S13",
+      "type": "image",
+      "start": 94.872,
+      "image": "episodes/001/images/S13.jpg",
+      "source": "S13",
+      "visual": "农业出现",
+      "motion": "zoomIn",
+      "chapter": "第二阶段 · 农业革命，让人类不再流动",
+      "end": 102.056
+    },
+    {
+      "id": "S14",
+      "type": "image",
+      "start": 102.056,
+      "image": "episodes/001/images/S14.jpg",
+      "source": "S14",
+      "visual": "定居的村落",
+      "motion": "panDown",
+      "chapter": "第二阶段 · 农业革命，让人类不再流动",
+      "end": 110.79
+    },
+    {
+      "id": "S15",
+      "type": "image",
+      "start": 110.79,
+      "image": "episodes/001/images/S15.jpg",
+      "source": "S15",
+      "visual": "土地有了价值",
+      "motion": "zoomIn",
+      "chapter": "第二阶段 · 农业革命，让人类不再流动",
+      "end": 119.262
+    },
+    {
+      "id": "S16",
+      "type": "image",
+      "start": 119.262,
+      "image": "episodes/001/images/S16.jpg",
+      "source": "S16",
+      "visual": "大河与水源",
+      "motion": "zoomOut",
+      "chapter": "第二阶段 · 农业革命，让人类不再流动",
+      "end": 128.692
+    },
+    {
+      "id": "S17",
+      "type": "image",
+      "start": 128.692,
+      "image": "episodes/001/images/S17.jpg",
+      "source": "S17",
+      "visual": "洪水来了",
+      "motion": "zoomOut",
+      "chapter": "第二阶段 · 农业革命，让人类不再流动",
+      "end": 133.682
+    },
+    {
+      "id": "S18",
+      "type": "image",
+      "start": 133.682,
+      "image": "episodes/001/images/S18.jpg",
+      "source": "S18",
+      "visual": "储粮与冲突",
+      "motion": "panLeft",
+      "chapter": "第二阶段 · 农业革命，让人类不再流动",
+      "end": 138.352
+    },
+    {
+      "id": "S19",
+      "type": "image",
+      "start": 138.352,
+      "image": "episodes/001/images/S19.jpg",
+      "source": "S19",
+      "visual": "小家庭的无力",
+      "motion": "panUp",
+      "chapter": "第二阶段 · 农业革命，让人类不再流动",
+      "end": 143.136
+    },
+    {
+      "id": "S20",
+      "type": "image",
+      "start": 143.136,
+      "image": "episodes/001/images/S20.jpg",
+      "source": "S20",
+      "visual": "大规模协作",
+      "motion": "zoomIn",
+      "chapter": "第二阶段 · 农业革命，让人类不再流动",
+      "end": 151.39
+    },
+    {
+      "id": "S21",
+      "type": "image",
+      "start": 151.39,
+      "image": "episodes/001/images/S21.jpg",
+      "source": "S21",
+      "visual": "首领的权力变大",
+      "motion": "panDown",
+      "chapter": "第二阶段 · 农业革命，让人类不再流动",
+      "end": 155.812
+    },
+    {
+      "id": "C3",
+      "type": "chapter",
+      "start": 155.812,
+      "kicker": "第三阶段",
+      "title": "部落联盟，开始出现早期国家",
+      "end": 160.18
+    },
+    {
+      "id": "S22",
+      "type": "image",
+      "start": 160.18,
+      "image": "episodes/001/images/S22.jpg",
+      "source": "S22",
+      "visual": "上古传说人物",
+      "motion": "zoomIn",
+      "chapter": "第三阶段 · 部落联盟，开始出现早期国家",
+      "end": 168.7
+    },
+    {
+      "id": "S23",
+      "type": "image",
+      "start": 168.7,
+      "image": "episodes/001/images/S23.jpg",
+      "source": "S23",
+      "visual": "考古与研究",
+      "motion": "panRight",
+      "chapter": "第三阶段 · 部落联盟，开始出现早期国家",
+      "end": 176.246
+    },
+    {
+      "id": "S24",
+      "type": "image",
+      "start": 176.246,
+      "image": "episodes/001/images/S24.jpg",
+      "source": "S24",
+      "visual": "部落联合",
+      "motion": "zoomOut",
+      "chapter": "第三阶段 · 部落联盟，开始出现早期国家",
+      "end": 183.27
+    },
+    {
+      "id": "S25",
+      "type": "image",
+      "start": 183.27,
+      "image": "episodes/001/images/S25.jpg",
+      "source": "S25",
+      "visual": "联盟共御危机",
+      "motion": "panLeft",
+      "chapter": "第三阶段 · 部落联盟，开始出现早期国家",
+      "end": 190.392
+    },
+    {
+      "id": "S26",
+      "type": "image",
+      "start": 190.392,
+      "image": "episodes/001/images/S26.jpg",
+      "source": "S26",
+      "visual": "联盟议事",
+      "motion": "panUp",
+      "chapter": "第三阶段 · 部落联盟，开始出现早期国家",
+      "end": 197.962
+    },
+    {
+      "id": "S27",
+      "type": "image",
+      "start": 197.962,
+      "image": "episodes/001/images/S27.jpg",
+      "source": "S27",
+      "visual": "大禹治水",
+      "motion": "zoomIn",
+      "chapter": "第三阶段 · 部落联盟，开始出现早期国家",
+      "end": 204.778
+    },
+    {
+      "id": "S28",
+      "type": "image",
+      "start": 204.778,
+      "image": "episodes/001/images/S28.jpg",
+      "source": "S28",
+      "visual": "疏通河道",
+      "motion": "zoomOut",
+      "chapter": "第三阶段 · 部落联盟，开始出现早期国家",
+      "end": 212.134
+    },
+    {
+      "id": "S29",
+      "type": "image",
+      "start": 212.134,
+      "image": "episodes/001/images/S29.jpg",
+      "source": "S29",
+      "visual": "获得权威",
+      "motion": "zoomIn",
+      "chapter": "第三阶段 · 部落联盟，开始出现早期国家",
+      "end": 216.238
+    },
+    {
+      "id": "S30",
+      "type": "image",
+      "start": 216.238,
+      "image": "episodes/001/images/S30.jpg",
+      "source": "S30",
+      "visual": "九鼎与王权",
+      "motion": "panRight",
+      "chapter": "第三阶段 · 部落联盟，开始出现早期国家",
+      "end": 224.508
+    },
+    {
+      "id": "C4",
+      "type": "chapter",
+      "start": 224.508,
+      "kicker": "第四阶段",
+      "title": "夏商周，国家开始真正出现",
+      "end": 228.802
+    },
+    {
+      "id": "S31",
+      "type": "image",
+      "start": 228.802,
+      "image": "episodes/001/images/S31.jpg",
+      "source": "S31",
+      "visual": "早期王都",
+      "motion": "zoomOut",
+      "chapter": "第四阶段 · 夏商周，国家开始真正出现",
+      "end": 238.042
+    },
+    {
+      "id": "S32",
+      "type": "image",
+      "start": 238.042,
+      "image": "episodes/001/images/S32.jpg",
+      "source": "S32",
+      "visual": "商朝的朝堂",
+      "motion": "panLeft",
+      "chapter": "第四阶段 · 夏商周，国家开始真正出现",
+      "end": 242.376
+    },
+    {
+      "id": "S33",
+      "type": "image",
+      "start": 242.376,
+      "image": "episodes/001/images/S33.jpg",
+      "source": "S33",
+      "visual": "商王祭祀与军队",
+      "motion": "panUp",
+      "chapter": "第四阶段 · 夏商周，国家开始真正出现",
+      "end": 250.59
+    },
+    {
+      "id": "S34",
+      "type": "image",
+      "start": 250.59,
+      "image": "episodes/001/images/S34.jpg",
+      "source": "S34",
+      "visual": "王权成为核心",
+      "motion": "zoomIn",
+      "chapter": "第四阶段 · 夏商周，国家开始真正出现",
+      "end": 253.368
+    },
+    {
+      "id": "S35",
+      "type": "image",
+      "start": 253.368,
+      "image": "episodes/001/images/S35.jpg",
+      "source": "S35",
+      "visual": "周朝分封",
+      "motion": "panDown",
+      "chapter": "第四阶段 · 夏商周，国家开始真正出现",
+      "end": 261.276
+    },
+    {
+      "id": "S36",
+      "type": "image",
+      "start": 261.276,
+      "image": "episodes/001/images/S36.jpg",
+      "source": "S36",
+      "visual": "层层授权",
+      "motion": "panUp",
+      "chapter": "第四阶段 · 夏商周，国家开始真正出现",
+      "end": 270.446
+    },
+    {
+      "id": "S37",
+      "type": "image",
+      "start": 270.446,
+      "image": "episodes/001/images/S37.jpg",
+      "source": "S37",
+      "visual": "诸侯坐大",
+      "motion": "panRight",
+      "chapter": "第四阶段 · 夏商周，国家开始真正出现",
+      "end": 276.114
+    },
+    {
+      "id": "S38",
+      "type": "image",
+      "start": 276.114,
+      "image": "episodes/001/images/S38.jpg",
+      "source": "S38",
+      "visual": "王室衰微",
+      "motion": "zoomOut",
+      "chapter": "第四阶段 · 夏商周，国家开始真正出现",
+      "end": 281.47
+    },
+    {
+      "id": "S39",
+      "type": "image",
+      "start": 281.47,
+      "image": "episodes/001/images/S39.jpg",
+      "source": "S39",
+      "visual": "春秋战国",
+      "motion": "panLeft",
+      "chapter": "第四阶段 · 夏商周，国家开始真正出现",
+      "end": 291.152
+    },
+    {
+      "id": "S40",
+      "type": "image",
+      "start": 291.152,
+      "image": "episodes/001/images/S40.jpg",
+      "source": "S40",
+      "visual": "分分合合",
+      "motion": "panDown",
+      "chapter": "第四阶段 · 夏商周，国家开始真正出现",
+      "end": 296.624
+    },
+    {
+      "id": "C5",
+      "type": "chapter",
+      "start": 296.624,
+      "kicker": "第五阶段",
+      "title": "秦朝，国家真正走向统一",
+      "end": 300.966
+    },
+    {
+      "id": "S41",
+      "type": "image",
+      "start": 300.966,
+      "image": "episodes/001/images/S41.jpg",
+      "source": "S41",
+      "visual": "战国大战",
+      "motion": "zoomIn",
+      "chapter": "第五阶段 · 秦朝，国家真正走向统一",
+      "end": 308.932
+    },
+    {
+      "id": "S42",
+      "type": "image",
+      "start": 308.932,
+      "image": "episodes/001/images/S42.jpg",
+      "source": "S42",
+      "visual": "比拼组织能力",
+      "motion": "panDown",
+      "chapter": "第五阶段 · 秦朝，国家真正走向统一",
+      "end": 318.15
+    },
+    {
+      "id": "S43",
+      "type": "image",
+      "start": 318.15,
+      "image": "episodes/001/images/S43.jpg",
+      "source": "S43",
+      "visual": "商鞅变法",
+      "motion": "zoomIn",
+      "chapter": "第五阶段 · 秦朝，国家真正走向统一",
+      "end": 322.77
+    },
+    {
+      "id": "S44",
+      "type": "image",
+      "start": 322.77,
+      "image": "episodes/001/images/S44.jpg",
+      "source": "S44",
+      "visual": "秦始皇统一六国",
+      "motion": "zoomIn",
+      "chapter": "第五阶段 · 秦朝，国家真正走向统一",
+      "end": 329.75
+    },
+    {
+      "id": "S45",
+      "type": "image",
+      "start": 329.75,
+      "image": "episodes/001/images/S45.jpg",
+      "source": "S45",
+      "visual": "郡县制",
+      "motion": "zoomOut",
+      "chapter": "第五阶段 · 秦朝，国家真正走向统一",
+      "end": 336.734
+    },
+    {
+      "id": "S46",
+      "type": "image",
+      "start": 336.734,
+      "image": "episodes/001/images/S46.jpg",
+      "source": "S46",
+      "visual": "统一度量衡",
+      "motion": "panLeft",
+      "chapter": "第五阶段 · 秦朝，国家真正走向统一",
+      "end": 342.182
+    },
+    {
+      "id": "S47",
+      "type": "image",
+      "start": 342.182,
+      "image": "episodes/001/images/S47.jpg",
+      "source": "S47",
+      "visual": "帝国的行政网",
+      "motion": "zoomOut",
+      "chapter": "第五阶段 · 秦朝，国家真正走向统一",
+      "end": 351.854
+    },
+    {
+      "id": "S48",
+      "type": "image",
+      "start": 351.854,
+      "image": "episodes/001/images/S48.jpg",
+      "source": "S48",
+      "visual": "现代国家的雏形",
+      "motion": "zoomOut",
+      "chapter": "第五阶段 · 秦朝，国家真正走向统一",
+      "end": 356.946
+    },
+    {
+      "id": "C6",
+      "type": "chapter",
+      "start": 356.946,
+      "kicker": "",
+      "title": "结语",
+      "end": 359.346
+    },
+    {
+      "id": "S49",
+      "type": "image",
+      "start": 359.346,
+      "image": "episodes/001/images/S49.jpg",
+      "source": "S49",
+      "visual": "历史长卷",
+      "motion": "panDown",
+      "chapter": "结语",
+      "end": 367.122
+    },
+    {
+      "id": "S50",
+      "type": "image",
+      "start": 367.122,
+      "image": "episodes/001/images/S07.jpg",
+      "source": "S07",
+      "visual": "回顾：部落",
+      "motion": "zoomOut",
+      "chapter": "结语",
+      "end": 372.396
+    },
+    {
+      "id": "S51",
+      "type": "image",
+      "start": 372.396,
+      "image": "episodes/001/images/S14.jpg",
+      "source": "S14",
+      "visual": "回顾：农业村落",
+      "motion": "panLeft",
+      "chapter": "结语",
+      "end": 376.588
+    },
+    {
+      "id": "S52",
+      "type": "image",
+      "start": 376.588,
+      "image": "episodes/001/images/S26.jpg",
+      "source": "S26",
+      "visual": "回顾：部落联盟",
+      "motion": "zoomIn",
+      "chapter": "结语",
+      "end": 386.08
+    },
+    {
+      "id": "S53",
+      "type": "image",
+      "start": 386.08,
+      "image": "episodes/001/images/S47.jpg",
+      "source": "S47",
+      "visual": "回顾：统一的国家",
+      "motion": "panUp",
+      "chapter": "结语",
+      "end": 392.066
+    },
+    {
+      "id": "S54",
+      "type": "image",
+      "start": 392.066,
+      "image": "episodes/001/images/S54.jpg",
+      "source": "S54",
+      "visual": "熟人社会到组织社会",
+      "motion": "panUp",
+      "chapter": "结语",
+      "end": 400.222
+    },
+    {
+      "id": "S55",
+      "type": "image",
+      "start": 400.222,
+      "image": "episodes/001/images/S55.jpg",
+      "source": "S55",
+      "visual": "夏商周到秦",
+      "motion": "zoomIn",
+      "chapter": "结语",
+      "end": 405.568
+    },
+    {
+      "id": "S56",
+      "type": "image",
+      "start": 405.568,
+      "image": "episodes/001/images/S56.jpg",
+      "source": "S56",
+      "visual": "下期：皇权从何而来",
+      "motion": "zoomIn",
+      "chapter": "结语",
+      "end": 413.768
+    },
+    {
+      "id": "S57",
+      "type": "image",
+      "start": 413.768,
+      "image": "episodes/001/images/S57.jpg",
+      "source": "S57",
+      "visual": "生来继承天下",
+      "motion": "zoomIn",
+      "chapter": "结语",
+      "end": 419.114
+    }
+  ],
+  "captions": [
+    {
+      "text": "如果我们把时间往回推几千年",
+      "start": 0.0,
+      "end": 2.039
+    },
+    {
+      "text": "会发现一个很有意思的问题",
+      "start": 2.039,
+      "end": 4.326
+    },
+    {
+      "text": "今天我们生活在一个国家里，有政府",
+      "start": 4.326,
+      "end": 7.373
+    },
+    {
+      "text": "有法律、有军队、有税收",
+      "start": 7.373,
+      "end": 9.994
+    },
+    {
+      "text": "但在几千年前",
+      "start": 9.994,
+      "end": 11.14
+    },
+    {
+      "text": "这些东西并不是天然存在的",
+      "start": 11.14,
+      "end": 13.772
+    },
+    {
+      "text": "最早的人类",
+      "start": 13.772,
+      "end": 14.652
+    },
+    {
+      "text": "可能只是几十个人组成的部落",
+      "start": 14.652,
+      "end": 17.288
+    },
+    {
+      "text": "后来，部落变成城邦",
+      "start": 17.288,
+      "end": 18.991
+    },
+    {
+      "text": "城邦之间发生战争",
+      "start": 18.991,
+      "end": 20.527
+    },
+    {
+      "text": "最终出现了更大的政治组织",
+      "start": 20.527,
+      "end": 23.158
+    },
+    {
+      "text": "那么，国家究竟是怎么诞生的？",
+      "start": 23.158,
+      "end": 25.752
+    },
+    {
+      "text": "为什么一个人可以统治几百万人？",
+      "start": 25.752,
+      "end": 28.174
+    },
+    {
+      "text": "又为什么大家愿意服从",
+      "start": 28.174,
+      "end": 29.796
+    },
+    {
+      "text": "一个远在千里之外的统治者？",
+      "start": 29.796,
+      "end": 32.324
+    },
+    {
+      "text": "今天，我们就结合中国历史",
+      "start": 32.324,
+      "end": 34.537
+    },
+    {
+      "text": "看看国家形成的过程",
+      "start": 34.537,
+      "end": 36.322
+    },
+    {
+      "text": "在远古时期",
+      "start": 40.478,
+      "end": 41.584
+    },
+    {
+      "text": "人类的生活非常简单",
+      "start": 41.584,
+      "end": 43.684
+    },
+    {
+      "text": "几十个人组成一个群体",
+      "start": 43.684,
+      "end": 45.324
+    },
+    {
+      "text": "一起狩猎、采集食物",
+      "start": 45.324,
+      "end": 47.702
+    },
+    {
+      "text": "大家可能没有什么明确的领导者",
+      "start": 47.702,
+      "end": 49.812
+    },
+    {
+      "text": "遇到事情，依靠经验丰富的老人",
+      "start": 49.812,
+      "end": 52.383
+    },
+    {
+      "text": "或者部落里比较有威望的人来决定",
+      "start": 52.383,
+      "end": 55.444
+    },
+    {
+      "text": "但随着人口增加",
+      "start": 55.444,
+      "end": 56.661
+    },
+    {
+      "text": "问题也越来越多",
+      "start": 56.661,
+      "end": 58.49
+    },
+    {
+      "text": "食物不够怎么办？",
+      "start": 58.49,
+      "end": 60.162
+    },
+    {
+      "text": "遇到其他部落抢夺资源怎么办？",
+      "start": 60.162,
+      "end": 62.858
+    },
+    {
+      "text": "谁来组织大家抵御野兽",
+      "start": 62.858,
+      "end": 64.831
+    },
+    {
+      "text": "或者其他群体的攻击？",
+      "start": 64.831,
+      "end": 66.872
+    },
+    {
+      "text": "于是，人类开始意识到",
+      "start": 66.872,
+      "end": 68.563
+    },
+    {
+      "text": "单靠个人力量",
+      "start": 68.563,
+      "end": 69.802
+    },
+    {
+      "text": "很难生存",
+      "start": 69.802,
+      "end": 71.22
+    },
+    {
+      "text": "大家需要组织起来",
+      "start": 71.22,
+      "end": 72.481
+    },
+    {
+      "text": "需要有人分配任务",
+      "start": 72.481,
+      "end": 73.755
+    },
+    {
+      "text": "需要有人协调冲突",
+      "start": 73.755,
+      "end": 75.882
+    },
+    {
+      "text": "最初的权力",
+      "start": 75.882,
+      "end": 76.764
+    },
+    {
+      "text": "可能来自一个人的能力",
+      "start": 76.764,
+      "end": 78.746
+    },
+    {
+      "text": "谁更勇敢，谁更有经验",
+      "start": 78.746,
+      "end": 80.803
+    },
+    {
+      "text": "谁能够带领大家获得食物",
+      "start": 80.803,
+      "end": 82.862
+    },
+    {
+      "text": "战胜敌人，谁就更容易成为领导者",
+      "start": 82.862,
+      "end": 86.302
+    },
+    {
+      "text": "这就是最早的权力来源",
+      "start": 86.302,
+      "end": 87.884
+    },
+    {
+      "text": "为了生存，人们开始接受组织和领导",
+      "start": 87.884,
+      "end": 90.644
+    },
+    {
+      "text": "真正改变人类社会的",
+      "start": 95.372,
+      "end": 96.909
+    },
+    {
+      "text": "是农业的出现",
+      "start": 96.909,
+      "end": 98.52
+    },
+    {
+      "text": "大约一万年前",
+      "start": 98.52,
+      "end": 99.628
+    },
+    {
+      "text": "人类开始种植农作物",
+      "start": 99.628,
+      "end": 101.259
+    },
+    {
+      "text": "驯养动物",
+      "start": 101.259,
+      "end": 102.556
+    },
+    {
+      "text": "这意味着",
+      "start": 102.556,
+      "end": 103.222
+    },
+    {
+      "text": "人类不再需要每天四处寻找食物",
+      "start": 103.222,
+      "end": 105.734
+    },
+    {
+      "text": "而是可以在一个地方长期生活",
+      "start": 105.734,
+      "end": 108.29
+    },
+    {
+      "text": "人口开始增加",
+      "start": 108.29,
+      "end": 109.352
+    },
+    {
+      "text": "村庄逐渐形成",
+      "start": 109.352,
+      "end": 111.29
+    },
+    {
+      "text": "而农业社会带来了",
+      "start": 111.29,
+      "end": 112.547
+    },
+    {
+      "text": "一个非常重要的变化",
+      "start": 112.547,
+      "end": 114.41
+    },
+    {
+      "text": "土地，开始变得有价值",
+      "start": 114.41,
+      "end": 116.708
+    },
+    {
+      "text": "谁拥有土地",
+      "start": 116.708,
+      "end": 117.848
+    },
+    {
+      "text": "谁就拥有粮食",
+      "start": 117.848,
+      "end": 119.762
+    },
+    {
+      "text": "谁控制水源",
+      "start": 119.762,
+      "end": 120.807
+    },
+    {
+      "text": "谁就能够决定农业生产",
+      "start": 120.807,
+      "end": 122.972
+    },
+    {
+      "text": "尤其是在中国，黄河",
+      "start": 122.972,
+      "end": 124.798
+    },
+    {
+      "text": "长江流域的农业发展",
+      "start": 124.798,
+      "end": 126.536
+    },
+    {
+      "text": "让越来越多的人聚集在一起",
+      "start": 126.536,
+      "end": 129.192
+    },
+    {
+      "text": "但农业也带来了新的问题",
+      "start": 129.192,
+      "end": 131.496
+    },
+    {
+      "text": "洪水怎么办？",
+      "start": 131.496,
+      "end": 132.776
+    },
+    {
+      "text": "灌溉怎么办？",
+      "start": 132.776,
+      "end": 134.182
+    },
+    {
+      "text": "粮食如何储存？",
+      "start": 134.182,
+      "end": 135.89
+    },
+    {
+      "text": "村庄之间发生冲突",
+      "start": 135.89,
+      "end": 137.365
+    },
+    {
+      "text": "谁来解决？",
+      "start": 137.365,
+      "end": 138.852
+    },
+    {
+      "text": "这些事情，已经不是一个家庭",
+      "start": 138.852,
+      "end": 140.96
+    },
+    {
+      "text": "或者一个小部落能够解决的了",
+      "start": 140.96,
+      "end": 143.636
+    },
+    {
+      "text": "于是，更大规模的组织开始出现",
+      "start": 143.636,
+      "end": 146.548
+    },
+    {
+      "text": "人们需要有人组织修建水利",
+      "start": 146.548,
+      "end": 148.563
+    },
+    {
+      "text": "协调劳动力",
+      "start": 148.563,
+      "end": 149.527
+    },
+    {
+      "text": "储存粮食、抵御外敌",
+      "start": 149.527,
+      "end": 151.89
+    },
+    {
+      "text": "而能够组织这些事情的人",
+      "start": 151.89,
+      "end": 153.633
+    },
+    {
+      "text": "逐渐获得了越来越大的权力",
+      "start": 153.633,
+      "end": 155.812
+    },
+    {
+      "text": "在中国古代传说中，黄帝、炎帝",
+      "start": 160.68,
+      "end": 163.453
+    },
+    {
+      "text": "以及后来的尧、舜、禹",
+      "start": 163.453,
+      "end": 165.905
+    },
+    {
+      "text": "往往被视为早期",
+      "start": 165.905,
+      "end": 167.167
+    },
+    {
+      "text": "部落联盟的代表人物",
+      "start": 167.167,
+      "end": 169.2
+    },
+    {
+      "text": "当然，这些人物的具体历史真实性",
+      "start": 169.2,
+      "end": 171.794
+    },
+    {
+      "text": "以及他们所处时代的政治组织形式",
+      "start": 171.794,
+      "end": 174.437
+    },
+    {
+      "text": "仍然存在研究和讨论",
+      "start": 174.437,
+      "end": 176.746
+    },
+    {
+      "text": "但从历史发展的角度来看",
+      "start": 176.746,
+      "end": 178.606
+    },
+    {
+      "text": "这些传说反映了一个重要趋势",
+      "start": 178.606,
+      "end": 181.24
+    },
+    {
+      "text": "不同的部落",
+      "start": 181.24,
+      "end": 182.071
+    },
+    {
+      "text": "开始联合起来",
+      "start": 182.071,
+      "end": 183.77
+    },
+    {
+      "text": "当一个部落的力量不足以应对洪水",
+      "start": 183.77,
+      "end": 186.497
+    },
+    {
+      "text": "战争或者其他危机时",
+      "start": 186.497,
+      "end": 188.426
+    },
+    {
+      "text": "多个部落就可能组成联盟",
+      "start": 188.426,
+      "end": 190.892
+    },
+    {
+      "text": "联盟需要共同的领导者",
+      "start": 190.892,
+      "end": 192.864
+    },
+    {
+      "text": "需要协调不同部落之间的利益",
+      "start": 192.864,
+      "end": 195.306
+    },
+    {
+      "text": "需要制定规则",
+      "start": 195.306,
+      "end": 196.814
+    },
+    {
+      "text": "需要组织战争",
+      "start": 196.814,
+      "end": 198.462
+    },
+    {
+      "text": "比如传说中的大禹治水",
+      "start": 198.462,
+      "end": 200.676
+    },
+    {
+      "text": "如果洪水只影响一个村庄",
+      "start": 200.676,
+      "end": 202.597
+    },
+    {
+      "text": "村庄自己或许就能解决",
+      "start": 202.597,
+      "end": 205.278
+    },
+    {
+      "text": "但如果洪水影响整个流域",
+      "start": 205.278,
+      "end": 207.293
+    },
+    {
+      "text": "就必须协调多个部落",
+      "start": 207.293,
+      "end": 209.043
+    },
+    {
+      "text": "统一调配人力、物资",
+      "start": 209.043,
+      "end": 210.84
+    },
+    {
+      "text": "甚至改变河道",
+      "start": 210.84,
+      "end": 212.634
+    },
+    {
+      "text": "谁能够完成这样的任务",
+      "start": 212.634,
+      "end": 214.167
+    },
+    {
+      "text": "谁就能够获得更大的权威",
+      "start": 214.167,
+      "end": 216.738
+    },
+    {
+      "text": "而这种权威",
+      "start": 216.738,
+      "end": 217.756
+    },
+    {
+      "text": "逐渐从个人威望",
+      "start": 217.756,
+      "end": 219.232
+    },
+    {
+      "text": "变成了能够支配",
+      "start": 219.232,
+      "end": 220.446
+    },
+    {
+      "text": "整个社会的政治权力",
+      "start": 220.446,
+      "end": 222.394
+    },
+    {
+      "text": "这就是国家形成的重要基础",
+      "start": 222.394,
+      "end": 224.508
+    },
+    {
+      "text": "随着社会规模越来越大",
+      "start": 229.302,
+      "end": 231.085
+    },
+    {
+      "text": "权力开始集中",
+      "start": 231.085,
+      "end": 232.752
+    },
+    {
+      "text": "在中国历史上，夏、商",
+      "start": 232.752,
+      "end": 234.916
+    },
+    {
+      "text": "周通常被视为早期",
+      "start": 234.916,
+      "end": 236.452
+    },
+    {
+      "text": "国家发展的重要阶段",
+      "start": 236.452,
+      "end": 238.542
+    },
+    {
+      "text": "到了商朝",
+      "start": 238.542,
+      "end": 239.424
+    },
+    {
+      "text": "我们已经能够看到",
+      "start": 239.424,
+      "end": 240.686
+    },
+    {
+      "text": "比较成熟的政治组织",
+      "start": 240.686,
+      "end": 242.876
+    },
+    {
+      "text": "商王不仅拥有军队",
+      "start": 242.876,
+      "end": 244.409
+    },
+    {
+      "text": "还能够组织祭祀",
+      "start": 244.409,
+      "end": 245.778
+    },
+    {
+      "text": "征收资源、管理土地",
+      "start": 245.778,
+      "end": 247.802
+    },
+    {
+      "text": "并且通过战争扩大自己的控制范围",
+      "start": 247.802,
+      "end": 251.09
+    },
+    {
+      "text": "王权开始成为整个社会的核心",
+      "start": 251.09,
+      "end": 253.868
+    },
+    {
+      "text": "到了周朝",
+      "start": 253.868,
+      "end": 254.718
+    },
+    {
+      "text": "统治者又建立了一套分封制度",
+      "start": 254.718,
+      "end": 257.312
+    },
+    {
+      "text": "周天子将土地分封给诸侯",
+      "start": 257.312,
+      "end": 259.48
+    },
+    {
+      "text": "诸侯再管理自己的领地",
+      "start": 259.48,
+      "end": 261.776
+    },
+    {
+      "text": "这套制度的本质",
+      "start": 261.776,
+      "end": 262.991
+    },
+    {
+      "text": "其实就是",
+      "start": 262.991,
+      "end": 264.13
+    },
+    {
+      "text": "中央无法直接管理所有地方",
+      "start": 264.13,
+      "end": 266.167
+    },
+    {
+      "text": "于是通过分层授权",
+      "start": 266.167,
+      "end": 267.762
+    },
+    {
+      "text": "让不同等级的贵族共同管理国家",
+      "start": 267.762,
+      "end": 270.946
+    },
+    {
+      "text": "但这种制度也有一个问题",
+      "start": 270.946,
+      "end": 273.282
+    },
+    {
+      "text": "诸侯拥有自己的土地",
+      "start": 273.282,
+      "end": 274.9
+    },
+    {
+      "text": "军队和臣民",
+      "start": 274.9,
+      "end": 276.614
+    },
+    {
+      "text": "随着时间推移",
+      "start": 276.614,
+      "end": 277.768
+    },
+    {
+      "text": "地方诸侯越来越强大",
+      "start": 277.768,
+      "end": 279.601
+    },
+    {
+      "text": "周天子的权力越来越弱",
+      "start": 279.601,
+      "end": 281.97
+    },
+    {
+      "text": "于是",
+      "start": 281.97,
+      "end": 282.421
+    },
+    {
+      "text": "春秋战国时期就出现了一个局面",
+      "start": 282.421,
+      "end": 285.398
+    },
+    {
+      "text": "名义上天下属于周天子，实际上",
+      "start": 285.398,
+      "end": 288.076
+    },
+    {
+      "text": "各个诸侯国已经",
+      "start": 288.076,
+      "end": 289.385
+    },
+    {
+      "text": "成为独立的政治实体",
+      "start": 289.385,
+      "end": 291.652
+    },
+    {
+      "text": "国家的形成",
+      "start": 291.652,
+      "end": 292.53
+    },
+    {
+      "text": "并不是一条直线",
+      "start": 292.53,
+      "end": 294.13
+    },
+    {
+      "text": "有时候权力集中",
+      "start": 294.13,
+      "end": 295.31
+    },
+    {
+      "text": "有时候又会分散",
+      "start": 295.31,
+      "end": 296.624
+    },
+    {
+      "text": "到了战国时期",
+      "start": 301.466,
+      "end": 302.56
+    },
+    {
+      "text": "各国之间不断战争",
+      "start": 302.56,
+      "end": 304.518
+    },
+    {
+      "text": "战争带来的",
+      "start": 304.518,
+      "end": 305.404
+    },
+    {
+      "text": "不只是领土争夺",
+      "start": 305.404,
+      "end": 306.904
+    },
+    {
+      "text": "更是国家组织能力的竞争",
+      "start": 306.904,
+      "end": 309.432
+    },
+    {
+      "text": "谁能够征收更多税粮？",
+      "start": 309.432,
+      "end": 311.568
+    },
+    {
+      "text": "谁能够动员更多士兵？",
+      "start": 311.568,
+      "end": 313.54
+    },
+    {
+      "text": "谁能够更有效地管理人口和土地？",
+      "start": 313.54,
+      "end": 316.27
+    },
+    {
+      "text": "谁就更有可能赢得战争",
+      "start": 316.27,
+      "end": 318.65
+    },
+    {
+      "text": "秦国通过改革",
+      "start": 318.65,
+      "end": 319.923
+    },
+    {
+      "text": "逐渐建立起一套",
+      "start": 319.923,
+      "end": 321.042
+    },
+    {
+      "text": "强大的中央集权制度",
+      "start": 321.042,
+      "end": 323.27
+    },
+    {
+      "text": "最终，秦始皇统一六国",
+      "start": 323.27,
+      "end": 325.592
+    },
+    {
+      "text": "公元前221年",
+      "start": 325.592,
+      "end": 327.144
+    },
+    {
+      "text": "秦朝建立",
+      "start": 327.144,
+      "end": 328.45
+    },
+    {
+      "text": "这件事非常重要",
+      "start": 328.45,
+      "end": 330.25
+    },
+    {
+      "text": "因为秦朝不再依靠",
+      "start": 330.25,
+      "end": 331.537
+    },
+    {
+      "text": "分封诸侯来管理地方",
+      "start": 331.537,
+      "end": 333.191
+    },
+    {
+      "text": "而是建立郡县制",
+      "start": 333.191,
+      "end": 334.644
+    },
+    {
+      "text": "由中央任命官员管理地方",
+      "start": 334.644,
+      "end": 337.234
+    },
+    {
+      "text": "同时，统一文字、货币、度量衡",
+      "start": 337.234,
+      "end": 340.185
+    },
+    {
+      "text": "修建道路，建立法律体系",
+      "start": 340.185,
+      "end": 342.682
+    },
+    {
+      "text": "从此",
+      "start": 342.682,
+      "end": 343.229
+    },
+    {
+      "text": "国家不再只是一个",
+      "start": 343.229,
+      "end": 344.514
+    },
+    {
+      "text": "统治者和贵族之间的联盟",
+      "start": 344.514,
+      "end": 346.574
+    },
+    {
+      "text": "而是开始形成一套",
+      "start": 346.574,
+      "end": 347.907
+    },
+    {
+      "text": "能够直接管理广大人口",
+      "start": 347.907,
+      "end": 349.8
+    },
+    {
+      "text": "土地和资源的行政体系",
+      "start": 349.8,
+      "end": 352.354
+    },
+    {
+      "text": "这才是我们今天理解的现代国家",
+      "start": 352.354,
+      "end": 354.797
+    },
+    {
+      "text": "在历史上的一个重要雏形",
+      "start": 354.797,
+      "end": 356.946
+    },
+    {
+      "text": "所以，国家到底是怎么形成的？",
+      "start": 359.846,
+      "end": 362.234
+    },
+    {
+      "text": "简单来说，它不是某一天突然诞生的",
+      "start": 362.234,
+      "end": 364.959
+    },
+    {
+      "text": "也不是某个人坐下来设计出来的",
+      "start": 364.959,
+      "end": 367.622
+    },
+    {
+      "text": "它经历了一个漫长的过程",
+      "start": 367.622,
+      "end": 369.752
+    },
+    {
+      "text": "最初，人类为了生存",
+      "start": 369.752,
+      "end": 371.501
+    },
+    {
+      "text": "组成部落",
+      "start": 371.501,
+      "end": 372.896
+    },
+    {
+      "text": "后来，农业让人口聚集",
+      "start": 372.896,
+      "end": 374.889
+    },
+    {
+      "text": "土地和资源变得重要",
+      "start": 374.889,
+      "end": 377.088
+    },
+    {
+      "text": "人口越来越多",
+      "start": 377.088,
+      "end": 378.139
+    },
+    {
+      "text": "社会越来越复杂",
+      "start": 378.139,
+      "end": 379.531
+    },
+    {
+      "text": "人们需要更强大的",
+      "start": 379.531,
+      "end": 380.734
+    },
+    {
+      "text": "组织来解决公共问题",
+      "start": 380.734,
+      "end": 382.942
+    },
+    {
+      "text": "于是，部落联盟出现",
+      "start": 382.942,
+      "end": 384.61
+    },
+    {
+      "text": "权力逐渐集中",
+      "start": 384.61,
+      "end": 386.58
+    },
+    {
+      "text": "再后来，战争、税收、法律",
+      "start": 386.58,
+      "end": 389.256
+    },
+    {
+      "text": "行政管理不断发展",
+      "start": 389.256,
+      "end": 390.791
+    },
+    {
+      "text": "最终形成国家",
+      "start": 390.791,
+      "end": 392.566
+    },
+    {
+      "text": "如果用一句话总结",
+      "start": 392.566,
+      "end": 394.32
+    },
+    {
+      "text": "国家的诞生",
+      "start": 394.32,
+      "end": 395.178
+    },
+    {
+      "text": "本质上是人类从小规模的熟人社会",
+      "start": 395.178,
+      "end": 398.083
+    },
+    {
+      "text": "走向大规模组织社会的结果",
+      "start": 398.083,
+      "end": 400.722
+    },
+    {
+      "text": "而中国历史上的夏商周",
+      "start": 400.722,
+      "end": 402.547
+    },
+    {
+      "text": "到秦朝统一",
+      "start": 402.547,
+      "end": 403.892
+    },
+    {
+      "text": "正好展现了这个过程",
+      "start": 403.892,
+      "end": 406.068
+    },
+    {
+      "text": "下一期",
+      "start": 406.068,
+      "end": 406.744
+    },
+    {
+      "text": "我们可以继续聊",
+      "start": 406.744,
+      "end": 407.637
+    },
+    {
+      "text": "一个更有意思的问题",
+      "start": 407.637,
+      "end": 409.406
+    },
+    {
+      "text": "既然国家是人类组织出来的",
+      "start": 409.406,
+      "end": 411.405
+    },
+    {
+      "text": "那么皇帝的权力又是从哪里来的？",
+      "start": 411.405,
+      "end": 414.268
+    },
+    {
+      "text": "为什么皇帝的儿子",
+      "start": 414.268,
+      "end": 415.432
+    },
+    {
+      "text": "一出生就有资格继承天下？",
+      "start": 415.432,
+      "end": 417.614
+    }
+  ],
+  "lines": [
+    {
+      "scene": "S01",
+      "text": "如果我们把时间往回推几千年，会发现一个很有意思的问题：",
+      "start": 0.0,
+      "end": 3.826
+    },
+    {
+      "scene": "S02",
+      "text": "今天我们生活在一个国家里，有政府、有法律、有军队、有税收。",
+      "start": 4.326,
+      "end": 9.644
+    },
+    {
+      "scene": "S02",
+      "text": "但在几千年前，这些东西并不是天然存在的。",
+      "start": 9.994,
+      "end": 13.272
+    },
+    {
+      "scene": "S03",
+      "text": "最早的人类，可能只是几十个人组成的部落。",
+      "start": 13.772,
+      "end": 16.938
+    },
+    {
+      "scene": "S03",
+      "text": "后来，部落变成城邦，城邦之间发生战争，最终出现了更大的政治组织。",
+      "start": 17.288,
+      "end": 22.658
+    },
+    {
+      "scene": "S04",
+      "text": "那么，国家究竟是怎么诞生的？",
+      "start": 23.158,
+      "end": 25.402
+    },
+    {
+      "scene": "S04",
+      "text": "为什么一个人可以统治几百万人？",
+      "start": 25.752,
+      "end": 27.824
+    },
+    {
+      "scene": "S04",
+      "text": "又为什么大家愿意服从一个远在千里之外的统治者？",
+      "start": 28.174,
+      "end": 31.824
+    },
+    {
+      "scene": "S05",
+      "text": "今天，我们就结合中国历史，看看国家形成的过程。",
+      "start": 32.324,
+      "end": 36.322
+    },
+    {
+      "scene": "C1",
+      "text": "第一阶段：人类为什么开始组织起来？",
+      "start": 36.922,
+      "end": 39.378
+    },
+    {
+      "scene": "S06",
+      "text": "在远古时期，人类的生活非常简单。",
+      "start": 40.478,
+      "end": 43.334
+    },
+    {
+      "scene": "S06",
+      "text": "几十个人组成一个群体，一起狩猎、采集食物。",
+      "start": 43.684,
+      "end": 47.202
+    },
+    {
+      "scene": "S07",
+      "text": "大家可能没有什么明确的领导者，遇到事情，依靠经验丰富的老人，或者部落里比较有威望的人来决定。",
+      "start": 47.702,
+      "end": 54.944
+    },
+    {
+      "scene": "S08",
+      "text": "但随着人口增加，问题也越来越多。",
+      "start": 55.444,
+      "end": 58.14
+    },
+    {
+      "scene": "S08",
+      "text": "食物不够怎么办？",
+      "start": 58.49,
+      "end": 59.662
+    },
+    {
+      "scene": "S09",
+      "text": "遇到其他部落抢夺资源怎么办？",
+      "start": 60.162,
+      "end": 62.508
+    },
+    {
+      "scene": "S09",
+      "text": "谁来组织大家抵御野兽，或者其他群体的攻击？",
+      "start": 62.858,
+      "end": 66.372
+    },
+    {
+      "scene": "S10",
+      "text": "于是，人类开始意识到，单靠个人力量，很难生存。",
+      "start": 66.872,
+      "end": 70.87
+    },
+    {
+      "scene": "S10",
+      "text": "大家需要组织起来，需要有人分配任务，需要有人协调冲突。",
+      "start": 71.22,
+      "end": 75.382
+    },
+    {
+      "scene": "S11",
+      "text": "最初的权力，可能来自一个人的能力。",
+      "start": 75.882,
+      "end": 78.396
+    },
+    {
+      "scene": "S11",
+      "text": "谁更勇敢，谁更有经验，谁能够带领大家获得食物、战胜敌人，谁就更容易成为领导者。",
+      "start": 78.746,
+      "end": 85.802
+    },
+    {
+      "scene": "S12",
+      "text": "这就是最早的权力来源：为了生存，人们开始接受组织和领导。",
+      "start": 86.302,
+      "end": 90.644
+    },
+    {
+      "scene": "C2",
+      "text": "第二阶段：农业革命，让人类不再流动",
+      "start": 91.244,
+      "end": 94.272
+    },
+    {
+      "scene": "S13",
+      "text": "真正改变人类社会的，是农业的出现。",
+      "start": 95.372,
+      "end": 98.17
+    },
+    {
+      "scene": "S13",
+      "text": "大约一万年前，人类开始种植农作物、驯养动物。",
+      "start": 98.52,
+      "end": 102.056
+    },
+    {
+      "scene": "S14",
+      "text": "这意味着，人类不再需要每天四处寻找食物，而是可以在一个地方长期生活。",
+      "start": 102.556,
+      "end": 107.94
+    },
+    {
+      "scene": "S14",
+      "text": "人口开始增加，村庄逐渐形成。",
+      "start": 108.29,
+      "end": 110.79
+    },
+    {
+      "scene": "S15",
+      "text": "而农业社会带来了一个非常重要的变化：",
+      "start": 111.29,
+      "end": 114.06
+    },
+    {
+      "scene": "S15",
+      "text": "土地，开始变得有价值。",
+      "start": 114.41,
+      "end": 116.358
+    },
+    {
+      "scene": "S15",
+      "text": "谁拥有土地，谁就拥有粮食。",
+      "start": 116.708,
+      "end": 119.262
+    },
+    {
+      "scene": "S16",
+      "text": "谁控制水源，谁就能够决定农业生产。",
+      "start": 119.762,
+      "end": 122.622
+    },
+    {
+      "scene": "S16",
+      "text": "尤其是在中国，黄河、长江流域的农业发展，让越来越多的人聚集在一起。",
+      "start": 122.972,
+      "end": 128.692
+    },
+    {
+      "scene": "S17",
+      "text": "但农业也带来了新的问题。",
+      "start": 129.192,
+      "end": 131.146
+    },
+    {
+      "scene": "S17",
+      "text": "洪水怎么办？",
+      "start": 131.496,
+      "end": 132.426
+    },
+    {
+      "scene": "S17",
+      "text": "灌溉怎么办？",
+      "start": 132.776,
+      "end": 133.682
+    },
+    {
+      "scene": "S18",
+      "text": "粮食如何储存？",
+      "start": 134.182,
+      "end": 135.54
+    },
+    {
+      "scene": "S18",
+      "text": "村庄之间发生冲突，谁来解决？",
+      "start": 135.89,
+      "end": 138.352
+    },
+    {
+      "scene": "S19",
+      "text": "这些事情，已经不是一个家庭，或者一个小部落能够解决的了。",
+      "start": 138.852,
+      "end": 143.136
+    },
+    {
+      "scene": "S20",
+      "text": "于是，更大规模的组织开始出现。",
+      "start": 143.636,
+      "end": 146.198
+    },
+    {
+      "scene": "S20",
+      "text": "人们需要有人组织修建水利、协调劳动力、储存粮食、抵御外敌。",
+      "start": 146.548,
+      "end": 151.39
+    },
+    {
+      "scene": "S21",
+      "text": "而能够组织这些事情的人，逐渐获得了越来越大的权力。",
+      "start": 151.89,
+      "end": 155.812
+    },
+    {
+      "scene": "C3",
+      "text": "第三阶段：部落联盟，开始出现早期国家",
+      "start": 156.412,
+      "end": 159.58
+    },
+    {
+      "scene": "S22",
+      "text": "在中国古代传说中，黄帝、炎帝，以及后来的尧、舜、禹，往往被视为早期部落联盟的代表人物。",
+      "start": 160.68,
+      "end": 168.7
+    },
+    {
+      "scene": "S23",
+      "text": "当然，这些人物的具体历史真实性，以及他们所处时代的政治组织形式，仍然存在研究和讨论。",
+      "start": 169.2,
+      "end": 176.246
+    },
+    {
+      "scene": "S24",
+      "text": "但从历史发展的角度来看，这些传说反映了一个重要趋势：",
+      "start": 176.746,
+      "end": 180.89
+    },
+    {
+      "scene": "S24",
+      "text": "不同的部落，开始联合起来。",
+      "start": 181.24,
+      "end": 183.27
+    },
+    {
+      "scene": "S25",
+      "text": "当一个部落的力量不足以应对洪水、战争或者其他危机时，多个部落就可能组成联盟。",
+      "start": 183.77,
+      "end": 190.392
+    },
+    {
+      "scene": "S26",
+      "text": "联盟需要共同的领导者。",
+      "start": 190.892,
+      "end": 192.514
+    },
+    {
+      "scene": "S26",
+      "text": "需要协调不同部落之间的利益。",
+      "start": 192.864,
+      "end": 194.956
+    },
+    {
+      "scene": "S26",
+      "text": "需要制定规则。",
+      "start": 195.306,
+      "end": 196.464
+    },
+    {
+      "scene": "S26",
+      "text": "需要组织战争。",
+      "start": 196.814,
+      "end": 197.962
+    },
+    {
+      "scene": "S27",
+      "text": "比如传说中的大禹治水。",
+      "start": 198.462,
+      "end": 200.326
+    },
+    {
+      "scene": "S27",
+      "text": "如果洪水只影响一个村庄，村庄自己或许就能解决。",
+      "start": 200.676,
+      "end": 204.778
+    },
+    {
+      "scene": "S28",
+      "text": "但如果洪水影响整个流域，就必须协调多个部落，统一调配人力、物资，甚至改变河道。",
+      "start": 205.278,
+      "end": 212.134
+    },
+    {
+      "scene": "S29",
+      "text": "谁能够完成这样的任务，谁就能够获得更大的权威。",
+      "start": 212.634,
+      "end": 216.238
+    },
+    {
+      "scene": "S30",
+      "text": "而这种权威，逐渐从个人威望，变成了能够支配整个社会的政治权力。",
+      "start": 216.738,
+      "end": 222.044
+    },
+    {
+      "scene": "S30",
+      "text": "这就是国家形成的重要基础。",
+      "start": 222.394,
+      "end": 224.508
+    },
+    {
+      "scene": "C4",
+      "text": "第四阶段：夏商周，国家开始真正出现",
+      "start": 225.108,
+      "end": 228.202
+    },
+    {
+      "scene": "S31",
+      "text": "随着社会规模越来越大，权力开始集中。",
+      "start": 229.302,
+      "end": 232.402
+    },
+    {
+      "scene": "S31",
+      "text": "在中国历史上，夏、商、周通常被视为早期国家发展的重要阶段。",
+      "start": 232.752,
+      "end": 238.042
+    },
+    {
+      "scene": "S32",
+      "text": "到了商朝，我们已经能够看到比较成熟的政治组织。",
+      "start": 238.542,
+      "end": 242.376
+    },
+    {
+      "scene": "S33",
+      "text": "商王不仅拥有军队，还能够组织祭祀、征收资源、管理土地，并且通过战争扩大自己的控制范围。",
+      "start": 242.876,
+      "end": 250.59
+    },
+    {
+      "scene": "S34",
+      "text": "王权开始成为整个社会的核心。",
+      "start": 251.09,
+      "end": 253.368
+    },
+    {
+      "scene": "S35",
+      "text": "到了周朝，统治者又建立了一套分封制度。",
+      "start": 253.868,
+      "end": 256.962
+    },
+    {
+      "scene": "S35",
+      "text": "周天子将土地分封给诸侯，诸侯再管理自己的领地。",
+      "start": 257.312,
+      "end": 261.276
+    },
+    {
+      "scene": "S36",
+      "text": "这套制度的本质，其实就是：",
+      "start": 261.776,
+      "end": 263.78
+    },
+    {
+      "scene": "S36",
+      "text": "中央无法直接管理所有地方，于是通过分层授权，让不同等级的贵族共同管理国家。",
+      "start": 264.13,
+      "end": 270.446
+    },
+    {
+      "scene": "S37",
+      "text": "但这种制度也有一个问题。",
+      "start": 270.946,
+      "end": 272.932
+    },
+    {
+      "scene": "S37",
+      "text": "诸侯拥有自己的土地、军队和臣民。",
+      "start": 273.282,
+      "end": 276.114
+    },
+    {
+      "scene": "S38",
+      "text": "随着时间推移，地方诸侯越来越强大，周天子的权力越来越弱。",
+      "start": 276.614,
+      "end": 281.47
+    },
+    {
+      "scene": "S39",
+      "text": "于是，春秋战国时期就出现了一个局面：",
+      "start": 281.97,
+      "end": 285.048
+    },
+    {
+      "scene": "S39",
+      "text": "名义上天下属于周天子，实际上，各个诸侯国已经成为独立的政治实体。",
+      "start": 285.398,
+      "end": 291.152
+    },
+    {
+      "scene": "S40",
+      "text": "国家的形成，并不是一条直线。",
+      "start": 291.652,
+      "end": 293.78
+    },
+    {
+      "scene": "S40",
+      "text": "有时候权力集中，有时候又会分散。",
+      "start": 294.13,
+      "end": 296.624
+    },
+    {
+      "scene": "C5",
+      "text": "第五阶段：秦朝，国家真正走向统一",
+      "start": 297.224,
+      "end": 300.366
+    },
+    {
+      "scene": "S41",
+      "text": "到了战国时期，各国之间不断战争。",
+      "start": 301.466,
+      "end": 304.168
+    },
+    {
+      "scene": "S41",
+      "text": "战争带来的，不只是领土争夺，更是国家组织能力的竞争。",
+      "start": 304.518,
+      "end": 308.932
+    },
+    {
+      "scene": "S42",
+      "text": "谁能够征收更多税粮？",
+      "start": 309.432,
+      "end": 311.218
+    },
+    {
+      "scene": "S42",
+      "text": "谁能够动员更多士兵？",
+      "start": 311.568,
+      "end": 313.19
+    },
+    {
+      "scene": "S42",
+      "text": "谁能够更有效地管理人口和土地？",
+      "start": 313.54,
+      "end": 315.92
+    },
+    {
+      "scene": "S42",
+      "text": "谁就更有可能赢得战争。",
+      "start": 316.27,
+      "end": 318.15
+    },
+    {
+      "scene": "S43",
+      "text": "秦国通过改革，逐渐建立起一套强大的中央集权制度。",
+      "start": 318.65,
+      "end": 322.77
+    },
+    {
+      "scene": "S44",
+      "text": "最终，秦始皇统一六国。",
+      "start": 323.27,
+      "end": 325.242
+    },
+    {
+      "scene": "S44",
+      "text": "公元前221年，秦朝建立。",
+      "start": 325.592,
+      "end": 328.1
+    },
+    {
+      "scene": "S44",
+      "text": "这件事非常重要。",
+      "start": 328.45,
+      "end": 329.75
+    },
+    {
+      "scene": "S45",
+      "text": "因为秦朝不再依靠分封诸侯来管理地方，而是建立郡县制，由中央任命官员管理地方。",
+      "start": 330.25,
+      "end": 336.734
+    },
+    {
+      "scene": "S46",
+      "text": "同时，统一文字、货币、度量衡，修建道路，建立法律体系。",
+      "start": 337.234,
+      "end": 342.182
+    },
+    {
+      "scene": "S47",
+      "text": "从此，国家不再只是一个统治者和贵族之间的联盟，而是开始形成一套能够直接管理广大人口、土地和资源的行政体系。",
+      "start": 342.682,
+      "end": 351.854
+    },
+    {
+      "scene": "S48",
+      "text": "这才是我们今天理解的现代国家，在历史上的一个重要雏形。",
+      "start": 352.354,
+      "end": 356.946
+    },
+    {
+      "scene": "S49",
+      "text": "所以，国家到底是怎么形成的？",
+      "start": 359.846,
+      "end": 361.884
+    },
+    {
+      "scene": "S49",
+      "text": "简单来说，它不是某一天突然诞生的，也不是某个人坐下来设计出来的。",
+      "start": 362.234,
+      "end": 367.122
+    },
+    {
+      "scene": "S50",
+      "text": "它经历了一个漫长的过程：",
+      "start": 367.622,
+      "end": 369.402
+    },
+    {
+      "scene": "S50",
+      "text": "最初，人类为了生存，组成部落。",
+      "start": 369.752,
+      "end": 372.396
+    },
+    {
+      "scene": "S51",
+      "text": "后来，农业让人口聚集，土地和资源变得重要。",
+      "start": 372.896,
+      "end": 376.588
+    },
+    {
+      "scene": "S52",
+      "text": "人口越来越多，社会越来越复杂，人们需要更强大的组织来解决公共问题。",
+      "start": 377.088,
+      "end": 382.592
+    },
+    {
+      "scene": "S52",
+      "text": "于是，部落联盟出现，权力逐渐集中。",
+      "start": 382.942,
+      "end": 386.08
+    },
+    {
+      "scene": "S53",
+      "text": "再后来，战争、税收、法律、行政管理不断发展，最终形成国家。",
+      "start": 386.58,
+      "end": 392.066
+    },
+    {
+      "scene": "S54",
+      "text": "如果用一句话总结：",
+      "start": 392.566,
+      "end": 393.97
+    },
+    {
+      "scene": "S54",
+      "text": "国家的诞生，本质上是人类从小规模的熟人社会，走向大规模组织社会的结果。",
+      "start": 394.32,
+      "end": 400.222
+    },
+    {
+      "scene": "S55",
+      "text": "而中国历史上的夏商周，到秦朝统一，正好展现了这个过程。",
+      "start": 400.722,
+      "end": 405.568
+    },
+    {
+      "scene": "S56",
+      "text": "下一期，我们可以继续聊一个更有意思的问题：",
+      "start": 406.068,
+      "end": 409.056
+    },
+    {
+      "scene": "S56",
+      "text": "既然国家是人类组织出来的，那么皇帝的权力又是从哪里来的？",
+      "start": 409.406,
+      "end": 413.768
+    },
+    {
+      "scene": "S57",
+      "text": "为什么皇帝的儿子，一出生就有资格继承天下？",
+      "start": 414.268,
+      "end": 417.614
+    }
+  ]
+}

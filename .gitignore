@@ -1,0 +1,8 @@
+node_modules/
+out/
+.cache/
+build/
+__pycache__/
+.env
+public/episodes/*/storyboard.bak.json
+public/episodes/*/compare/

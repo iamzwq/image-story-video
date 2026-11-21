@@ -1,0 +1,31 @@
+{
+  "name": "image-story-video",
+  "version": "1.0.0",
+  "description": "配音驱动的图文口播视频：文案 → 配音 → 字幕/分镜时间线 → Remotion 渲染",
+  "private": true,
+  "license": "UNLICENSED",
+  "scripts": {
+    "dev": "remotion studio",
+    "make": "uv run scripts/make_video.py",
+    "storyboard": "uv run scripts/gen_storyboard.py",
+    "voice": "uv run scripts/build_episode.py",
+    "images": "uv run scripts/gen_images.py",
+    "render": "remotion render",
+    "lint": "tsc"
+  },
+  "dependencies": {
+    "@remotion/cli": "4.0.545",
+    "@remotion/fonts": "4.0.545",
+    "@remotion/media": "4.0.545",
+    "react": "19.3.1",
+    "react-dom": "19.3.1",
+    "remotion": "4.0.545"
+  },
+  "devDependencies": {
+    "@types/react": "19.3.0",
+    "typescript": "5.9.3"
+  },
+  "engines": {
+    "node": "^20.19.0 || ^22.13.0 || >=24"
+  }
+}
