@@ -1,6 +1,6 @@
 # /// script
 # requires-python = ">=3.10"
-# dependencies = ["edge-tts>=7.2"]
+# dependencies = ["edge-tts>=7.2", "pypinyin>=0.55"]
 # ///
 """用大模型把口播文案写成分镜（storyboard.json），然后自动配音、生成时间线和出图提示词。
 
@@ -8,7 +8,8 @@
     npm run storyboard -- 002 --force    已有分镜时重新生成（旧文件备份为 storyboard.bak.json）
 
 大模型在 .env 里配置（LLM_BASE_URL / LLM_API_KEY / LLM_MODEL），任何兼容 OpenAI 协议的服务都可以。
-模型只决定「哪几句合成一个画面」和每个画面的描述、提示词，台词原文由脚本保留，不会被改写。
+模型决定「哪几句合成一个画面」和每个画面的描述、提示词，并标出容易读错的词（用同音字写进 pronunciation，
+只影响配音）；台词原文由脚本保留，不会被改写。
 """
 from __future__ import annotations
 
@@ -21,6 +22,9 @@ import sys
 import time
 from pathlib import Path
 
+from pypinyin import Style, lazy_pinyin, pinyin
+from pypinyin.contrib.tone_convert import to_tone3
+
 sys.path.insert(0, str(Path(__file__).resolve().parent))
 import build_episode as be  # noqa: E402
 from api_common import ApiError, LLMError, chat, llm_settings, missing_llm_vars  # noqa: E402
@@ -28,6 +32,22 @@ from envfile import env, load_env  # noqa: E402
 
 MOTIONS = {"zoomIn", "zoomOut", "panLeft", "panRight", "panUp", "panDown"}
 CHUNK_LINES = 24  # 每次请求最多发送的句子数，长章节会拆成几次
+HANZI_RE = re.compile(r"[\u3007\u3400-\u4dbf\u4e00-\u9fff\uf900-\ufaff\U00020000-\U0003134f]+")
+
+PRONOUNCE_PROMPT = """你是播音审校，负责找出语音合成（TTS）容易读错的词，用同音字替换来纠正。替换只影响配音，字幕仍显示原文。
+
+只挑真正容易读错的词：
+1. 多音字在文中读的不是最常用的音，例如「禅让」的禅读 shàn。
+2. 生僻字，以及读法特殊的古代人名、地名、官职、族名，例如「单于」读 chán yú、「冒顿」读 mò dú。
+常用词、按常用读音就能读对的词，以及数字、年份都不要列。宁缺毋滥，没有就输出空列表。
+
+每一项的字段：
+- word：原文里的词，必须与原文一字不差，至少两个字。替换会作用到全文所有出现这个词的地方，所以它在每一处的读音都必须相同，做不到就换成更长的词组。
+- pinyin：这个词在文中的正确读音，用带声调符号的拼音，音节之间用空格隔开。
+- say：读音与 pinyin 完全相同（包括声调）的替换文字，字数与 word 相同，只用汉字。尽量选只有一个读音的常用字，原本就能读对的字保留不变。
+
+只输出 JSON，不要输出解释，格式：
+{"words":[{"word":"单于","pinyin":"chán yú","say":"蝉于"}]}"""
 
 SYSTEM_PROMPT = """你是短视频分镜师，负责把口播文案拆成画面。视频形式是「AI 配音 + 静态插画 + 字幕」，每个画面是一张 AI 生成的插画，播放时镜头会缓慢推拉。
 
@@ -164,13 +184,88 @@ def plan_chunk(cfg, ctx: str, section: str, lines: list[tuple[str, float]], know
     return fallback_groups(lines)
 
 
+def syllables(text: str) -> list[str]:
+    """把拼音拆成音节，统一写成 chan2 这样的数字声调，轻声记为 5。"""
+    return [to_tone3(s, neutral_tone_with_five=True) for s in re.split(r"[\s'’-]+", text.lower()) if s]
+
+
+def same_sound(a: str, b: str) -> bool:
+    """两个音节是否同音。词典对轻声的标法不统一，所以轻声和任何声调都算相同。"""
+    ma, mb = re.fullmatch(r"([a-z]+)([1-5])", a), re.fullmatch(r"([a-z]+)([1-5])", b)
+    return bool(ma and mb) and ma[1] == mb[1] and (ma[2] == mb[2] or "5" in (ma[2], mb[2]))
+
+
+def check_pronunciation(obj, text: str) -> tuple[list[tuple[str, str, str]], list[str]]:
+    """检查模型标出的读音，返回 ([(原词, 同音字, 拼音)], 没有采用的说明)。
+    拼音要是字典里这几个字的读音之一，同音字的读音要和拼音一致，防止模型选错字、标错声调。"""
+    items = obj.get("words") if isinstance(obj, dict) else obj
+    if not isinstance(items, list):
+        raise PlanError("没有 words 数组")
+    accepted: list[tuple[str, str, str]] = []
+    rejected: list[str] = []
+    for item in items:
+        if not isinstance(item, dict):
+            continue
+        word, say = str(item.get("word") or "").strip(), str(item.get("say") or "").strip()
+        py = " ".join(str(item.get("pinyin") or "").split())
+        if (len(word) < 2 or word not in text or not HANZI_RE.fullmatch(word) or say == word
+                or len(say) != len(word) or not HANZI_RE.fullmatch(say) or any(w == word for w, _, _ in accepted)):
+            continue
+        want = syllables(py)
+        readings = [pinyin(ch, style=Style.TONE3, heteronym=True, neutral_tone_with_five=True)[0] for ch in word]
+        if len(want) != len(word) or not all(
+                r == [ch] or any(same_sound(w, x) for x in r) for ch, w, r in zip(word, want, readings)):
+            rejected.append(f"{word}（{py or '没有拼音'}）：拼音和字典里这几个字的读音对不上")
+            continue
+        if not all(same_sound(w, g) for w, g in zip(want, lazy_pinyin(say, style=Style.TONE3, neutral_tone_with_five=True))):
+            rejected.append(f"{word}→{say}：「{say}」读 {' '.join(lazy_pinyin(say, style=Style.TONE))}，不是 {py}")
+            continue
+        accepted.append((word, say, py))
+    return accepted, rejected
+
+
+def find_pronunciation(cfg, heading: str, text: str, warnings: list[str]) -> dict[str, str]:
+    """让大模型标出容易读错的词，返回写进 pronunciation 的 {原词: 同音字}。"""
+    print(f"正在用 {env('LLM_MODEL')} 找出容易读错的词…")
+    messages = [{"role": "system", "content": PRONOUNCE_PROMPT},
+                {"role": "user", "content": f"视频标题：{heading}\n\n文案：\n{text}"}]
+    last_error = ""
+    for _ in range(2):
+        content = ""
+        try:
+            content = ask(cfg, messages)
+            accepted, rejected = check_pronunciation(extract_json(content), text)
+        except PlanError as err:
+            last_error = str(err)
+            if content:
+                messages += [{"role": "assistant", "content": content},
+                             {"role": "user", "content": f"上面的输出有问题：{err}。请按要求重新输出完整的 JSON。"}]
+            continue
+        if accepted:
+            print(f"  配音时改读同音字（字幕仍显示原文）：{'、'.join(f'{w}→{s}（{p}）' for w, s, p in accepted)}")
+        else:
+            print("  没有找到需要纠正读音的词")
+        if rejected:
+            warnings.append(f"这些读音建议没有采用，需要的话自己写进 pronunciation：{'；'.join(rejected)}")
+        return {w: s for w, s, _ in accepted}
+    warnings.append(f"没能让模型标出容易读错的词（{last_error}），pronunciation 是空的，需要的话自己补")
+    return {}
+
+
 def create_storyboard(episode: str, md_path: Path, voice: str, rate: str, aspect: str) -> int:
-    """配音（用于统计时长）→ 大模型分组写提示词 → 写入 storyboard.json。返回原本就在 images 里的图片数。"""
+    """标出容易读错的词 → 配音（用于统计时长）→ 大模型分组写提示词 → 写入 storyboard.json。返回原本就在 images 里的图片数。"""
     cfg = require_llm()
     ep_dir = be.EPISODES_DIR / episode
     sb_path = ep_dir / "storyboard.json"
     pieces = be.script_pieces(md_path)
-    be.synth_all([t for _, ts in pieces for t in ts], voice, rate)
+    title, subtitle = be.titles_from_filename(md_path)
+    heading = f"{title}{'——' + subtitle if subtitle else ''}"
+    full_text = "\n".join(t for _, ts in pieces for t in ts)
+    warnings: list[str] = []
+    pron = find_pronunciation(cfg, heading, full_text, warnings)
+    # 按替换读音后的文字合成，和之后 voice 用的缓存一致，不会重复合成
+    spoken = {t: be.apply_pronunciation(t, pron)[0] for _, ts in pieces for t in ts}
+    be.synth_all(list(spoken.values()), voice, rate)
 
     # 按章节切段：每段是 (段落名, 章节单元或 None, [(句子, 时长)])
     sections: list[tuple[str, dict | None, list[tuple[str, float]]]] = []
@@ -182,18 +277,15 @@ def create_storyboard(episode: str, md_path: Path, voice: str, rate: str, aspect
             label = f"{unit['kicker']}：{unit['title']}" if unit["kicker"] else unit["title"]
             name, chapter_unit, current = label, {"unit": unit, "texts": texts}, []
         else:
-            current += [(t, be.line_duration(t, voice, rate)) for t in texts]
+            current += [(t, be.line_duration(spoken[t], voice, rate)) for t in texts]
     sections.append((name, chapter_unit, current))
 
-    title, subtitle = be.titles_from_filename(md_path)
-    full_text = "\n".join(t for _, ts in pieces for t in ts)
-    ctx = f"视频标题：{title}{'——' + subtitle if subtitle else ''}\n完整文案（只用来理解上下文）：\n{full_text[:8000]}"
+    ctx = f"视频标题：{heading}\n完整文案（只用来理解上下文）：\n{full_text[:8000]}"
     total_calls = sum(math.ceil(len(lines) / CHUNK_LINES) for _, _, lines in sections if lines)
     print(f"正在用 {env('LLM_MODEL')} 写分镜（共 {total_calls} 段，每段通常需要 10–60 秒）…")
 
     scenes: list[dict] = []
     known: list[tuple[str, str]] = []
-    warnings: list[str] = []
     n_img = n_ch = call = 0
     for name, chapter, lines in sections:
         if chapter:
@@ -230,10 +322,13 @@ def create_storyboard(episode: str, md_path: Path, voice: str, rate: str, aspect
     if sb_path.exists():
         shutil.copyfile(sb_path, ep_dir / "storyboard.bak.json")
         print("旧分镜已备份为 storyboard.bak.json")
-    be.write_json(sb_path, be.new_storyboard(md_path, voice, rate, aspect, scenes))
+    be.write_json(sb_path, be.new_storyboard(md_path, voice, rate, aspect, scenes, pron))
     images = [s for s in scenes if s.get("type") != "chapter"]
     reused = sum(1 for s in images if s.get("reuse"))
     print(f"已写好分镜：{be.rel(sb_path)}（{len(images)} 个画面，其中 {reused} 个复用前面的图，需要出图 {len(images) - reused} 张）")
+    if pron:
+        print(f"上面改读同音字的 {len(pron)} 个词写在 storyboard.json 的 pronunciation 里，建议在预览里听一下；"
+              f"读得不对就修改或删掉，再运行 npm run voice -- {episode}")
     for w in warnings:
         print(f"注意：{w}")
     return stale_images

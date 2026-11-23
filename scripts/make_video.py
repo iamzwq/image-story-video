@@ -1,6 +1,6 @@
 # /// script
 # requires-python = ">=3.10"
-# dependencies = ["edge-tts>=7.2"]
+# dependencies = ["edge-tts>=7.2", "pypinyin>=0.55"]
 # ///
 """一键生成：文案 → 分镜 → 配音 → 出图 → 导出视频，中途不需要人工操作。
 

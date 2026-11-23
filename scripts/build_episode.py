@@ -487,7 +487,8 @@ def chapter_scene(n: int, unit: dict, texts: list[str]) -> dict:
     return {"id": f"C{n}", "type": "chapter", "kicker": unit["kicker"], "title": unit["title"], "lines": texts}
 
 
-def new_storyboard(md_path: Path, voice: str, rate: str, aspect: str, scenes: list[dict]) -> dict:
+def new_storyboard(md_path: Path, voice: str, rate: str, aspect: str, scenes: list[dict],
+                   pronunciation: dict[str, str] | None = None) -> dict:
     title, subtitle = titles_from_filename(md_path)
     return {
         "title": title,
@@ -497,7 +498,7 @@ def new_storyboard(md_path: Path, voice: str, rate: str, aspect: str, scenes: li
         "voice": voice,
         "rate": rate,
         "pauses": dict(DEFAULT_PAUSES),
-        "pronunciation": {},
+        "pronunciation": pronunciation or {},
         "bgm": None,
         "imageStyle": DEFAULT_STYLE,
         "negativePrompt": DEFAULT_NEGATIVE,
