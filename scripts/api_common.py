@@ -42,9 +42,6 @@ def classify_error(status: int, body: str) -> ApiError:
     low = (code + message).lower()
     moderation = any(h in low for h in MODERATION_HINTS)
     if code.lower().startswith(QUOTA_CODES) and not re.search(r"queue|排队", low):
-        if "agentplan" in code.lower():
-            return ApiError("Agent Plan 套餐的燃料值（AFP）用完了：等额度恢复，或者在方舟控制台升级套餐、开启超额后付费。"
-                            f"（{detail}）", fatal=True)
         return ApiError(f"额度用完或达到了用量上限，等额度恢复后再试：{detail}", fatal=True)
     if status == 429 or status >= 500:
         return ApiError(f"平台繁忙或限流（HTTP {status}）：{detail}", retry=True)

@@ -46,9 +46,6 @@ PRICES = {
     "z-image-turbo": 0.10, "qwen-image-2.1-turbo": 0.10, "qwen-image-2.1-pro": 0.25,
     "qwen-image-2.0-pro": 0.50, "qwen-image-2.0": 0.20, "qwen-image-3.0-pro": 0.25, "qwen-image-3.0": 0.18,
 }
-# 方舟 Agent Plan 套餐（ARK_BASE_URL 带 /api/plan）出图不按张收费，扣的是套餐的燃料值（AFP）。
-# 2026-11 官网抵扣规则（AFP/张）；本项目的出图尺寸都不超过 261 万像素，按这一档计算
-PLAN_AFP = {"doubao-seedream-5-5": 65, "doubao-seedream-5-0-flash": 60, "doubao-seedream-5-0-pro": 150}
 ALIASES = {
     "bailian": "bailian", "aliyun": "bailian", "dashscope": "bailian", "qwen": "bailian", "z-image": "bailian",
     "ark": "ark", "volc": "ark", "volcengine": "ark", "seedream": "ark", "doubao": "ark", "jimeng": "ark",
@@ -79,13 +76,8 @@ class Provider:
     base_url: str
 
     @property
-    def plan(self) -> bool:
-        """是否走方舟 Agent Plan 套餐：出图扣套餐额度，不按张收费。"""
-        return self.key == "ark" and "/api/plan" in self.base_url
-
-    @property
     def label(self) -> str:
-        return f"{LABELS[self.key]}（{self.model}{'，Agent Plan 套餐' if self.plan else ''}）"
+        return f"{LABELS[self.key]}（{self.model}）"
 
     def generate(self, prompt: str, negative: str, size: tuple[int, int]) -> bytes:
         return self._bailian(prompt, negative, size) if self.key == "bailian" else self._ark(prompt, size)
@@ -194,20 +186,11 @@ def pick_providers(args: argparse.Namespace) -> list[Provider]:
     return []
 
 
-def lookup(table: dict, model: str):
-    # 模型名里的点和横线视为相同：doubao-seedream-5.5 和 doubao-seedream-5-5-261028 是同一个模型
-    norm = model.replace(".", "-")
-    best = max((k for k in table if norm.startswith(k.replace(".", "-"))), key=len, default=None)
-    return table[best] if best else None
-
-
 def estimate(model: str) -> float | None:
-    return lookup(PRICES, model)
-
-
-def image_cost(p: Provider) -> tuple[float | None, int | None]:
-    """单张图的参考消耗：(元, AFP)。走 Agent Plan 套餐时不按张收费，只扣 AFP。"""
-    return (0.0, lookup(PLAN_AFP, p.model)) if p.plan else (estimate(p.model), None)
+    """单张图的参考价（元）。模型名里的点和横线视为相同，并按最长前缀匹配，如 doubao-seedream-5-5-261028。"""
+    norm = model.replace(".", "-")
+    best = max((k for k in PRICES if norm.startswith(k.replace(".", "-"))), key=len, default=None)
+    return PRICES[best] if best else None
 
 
 def compose_prompt(scene: dict, style: str, aspect: str) -> str:
@@ -428,7 +411,7 @@ def run(args: argparse.Namespace) -> dict:
         be.die(f"还没有 {be.rel(sb_path)}：请先运行 npm run storyboard -- {args.episode} 或 npm run voice -- {args.episode}")
     sb = be.load_storyboard(sb_path)
     be.validate(sb)
-    result: dict = {"done": 0, "failed": [], "fixed": [], "cost": 0.0, "spent": 0.0, "afp": 0}
+    result: dict = {"done": 0, "failed": [], "fixed": [], "cost": 0.0, "spent": 0.0}
 
     scenes = select_scenes(sb, ep_dir, args.episode, args)
     if not scenes:
@@ -455,13 +438,10 @@ def run(args: argparse.Namespace) -> dict:
         if not todo:
             print(f"{p.label}：这几张已经生成过，跳过（要重画请加 --force）")
             continue
-        yuan, afp = image_cost(p)
+        yuan = estimate(p.model)
         n = len(todo)
-        if p.plan:
-            note = f"，约消耗 {afp * n:,} AFP 套餐额度" if afp else "，扣套餐额度（每张消耗多少见方舟控制台）"
-        else:
-            cost += (yuan or 0) * n
-            note = f"，约 {yuan * n:.2f} 元" if yuan else "，单价未知"
+        cost += (yuan or 0) * n
+        note = f"，约 {yuan * n:.2f} 元" if yuan else "，单价未知"
         ids = ", ".join(sc["id"] for sc in todo[:12]) + (" 等" if n > 12 else "")
         print(f"{p.label}：生成 {n} 张（{ids}）{note}")
     if args.compare and not any(todo for _, _, todo in batches):
@@ -470,8 +450,6 @@ def run(args: argparse.Namespace) -> dict:
         return result
     if cost:
         print(f"预计共约 {cost:.2f} 元（参考价，以平台账单为准；审核未通过或失败的不收费）")
-    if any(p.plan and todo for p, _, todo in batches):
-        print("Agent Plan 套餐按燃料值（AFP）扣额度，不按张收费；额度用完会停止出图（开启了超额后付费的话，会转为按量计费）")
     result["cost"] = cost
     if args.max_cost is not None and cost > args.max_cost:
         be.die(f"预计费用约 {cost:.2f} 元，超过了上限 {args.max_cost:g} 元，已停止，没有产生费用。"
@@ -506,9 +484,8 @@ def run(args: argparse.Namespace) -> dict:
         be.write_json(sb_path, sb)
         print(f"有 {len(fixed)} 个分镜的提示词被大模型改写后才通过审核，新提示词已写回 storyboard.json：{', '.join(sorted(fixed))}")
     failed_ids = sorted({sc["id"] for _, sc, _ in failed})
-    spent = sum(image_cost(p)[0] or 0 for p, _, _ in done)
-    afp_spent = sum(image_cost(p)[1] or 0 for p, _, _ in done)
-    result.update(done=len(done), failed=failed_ids, fixed=sorted(fixed), spent=spent, afp=afp_spent)
+    spent = sum(estimate(p.model) or 0 for p, _, _ in done)
+    result.update(done=len(done), failed=failed_ids, fixed=sorted(fixed), spent=spent)
     print()
     print(f"完成 {len(done)} 张，失败 {len(failed)} 张")
     if args.compare:

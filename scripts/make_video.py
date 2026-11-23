@@ -128,7 +128,7 @@ def main() -> None:
     stage(3, "出图")
     missing = missing_images(episode)
     check_prompts(episode, missing)
-    images_result = {"done": 0, "failed": [], "fixed": [], "cost": 0.0, "spent": 0.0, "afp": 0}
+    images_result = {"done": 0, "failed": [], "fixed": [], "cost": 0.0, "spent": 0.0}
     if missing:
         images_result = gi.run(image_args(args))
     else:
@@ -152,8 +152,7 @@ def main() -> None:
     print(f"用时：{minutes:.1f} 分钟")
     if images_result["done"]:
         cost = f"，约 {images_result['spent']:.2f} 元" if images_result["spent"] else ""
-        afp = f"，约消耗 {images_result['afp']:,} AFP 套餐额度" if images_result["afp"] else ""
-        print(f"本次出图：{images_result['done']} 张{cost}{afp}（参考值，以平台账单和控制台为准）")
+        print(f"本次出图：{images_result['done']} 张{cost}（参考值，以平台账单为准）")
     if images_result["fixed"]:
         print(f"提示词被大模型改写后才通过审核的分镜：{', '.join(images_result['fixed'])}")
     if info["filled"]:
