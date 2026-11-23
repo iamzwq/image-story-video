@@ -506,35 +506,80 @@ def new_storyboard(md_path: Path, voice: str, rate: str, aspect: str, scenes: li
     }
 
 
-def make_draft(episode: str, md_path: Path, voice: str, rate: str, aspect: str) -> dict:
+def time_groups(durations: list[float]) -> list[tuple[int, int]]:
+    """按配音时长把相邻的句子分组：凑够 SCENE_TARGET 秒就换画面，尽量不超过 SCENE_MAX 秒。
+    返回 [(起, 止)]，句子编号从 1 开始、包含两端。"""
+    groups, start, dur = [], 1, 0.0
+    for i, d in enumerate(durations, 1):
+        if i > start and (dur >= SCENE_TARGET or dur + d > SCENE_MAX):
+            groups.append((start, i - 1))
+            start, dur = i, 0.0
+        dur += d + DEFAULT_PAUSES["line"]
+    groups.append((start, len(durations)))
+    return groups
+
+
+def even_groups(durations: list[float], count: int) -> list[tuple[int, int]]:
+    """把相邻的句子按顺序正好分成 count 组，各组时长尽量接近。返回格式同 time_groups。"""
+    ends, total = [], 0.0
+    for d in durations:
+        total += d
+        ends.append(total)
+    edges = [0]
+    for j in range(1, count):
+        # 每组至少一句，还要给后面的每组各留一句
+        edges.append(min(range(edges[-1] + 1, len(durations) - count + j + 1),
+                         key=lambda i: abs(ends[i - 1] - total * j / count)))
+    edges.append(len(durations))
+    return [(edges[i] + 1, edges[i + 1]) for i in range(count)]
+
+
+def check_image_count(total: int, sizes: list[int]) -> None:
+    """检查 --images 是否可行。sizes 是按章节切段后各段（开场、各章节）的句子数，不含没有句子的段。"""
+    if total < len(sizes):
+        die(f"这篇文案按章节分成 {len(sizes)} 段，每段至少要 1 张图，--images 不能小于 {len(sizes)}")
+    if total > sum(sizes):
+        die(f"文案一共只有 {sum(sizes)} 句，每张图至少对应一句，--images 不能大于 {sum(sizes)}")
+
+
+def allocate_images(total: int, sections: list[list[float]]) -> list[int]:
+    """整集只用 total 张图时，每段分几张。sections 是各段每句的配音时长。
+    每段至少 1 张、最多每句 1 张；多出来的优先给「每张图停留最久」的段，让整集每张图的停留时长尽量接近。"""
+    check_image_count(total, [len(s) for s in sections])
+    counts = [1] * len(sections)
+    seconds = [sum(s) for s in sections]
+    for _ in range(total - len(sections)):
+        i = max((i for i, s in enumerate(sections) if counts[i] < len(s)), key=lambda i: seconds[i] / counts[i])
+        counts[i] += 1
+    return counts
+
+
+def make_draft(episode: str, md_path: Path, voice: str, rate: str, aspect: str, image_count: int | None = None) -> dict:
     pieces = script_pieces(md_path)
     synth_all([t for _, ts in pieces for t in ts], voice, rate)
 
-    scenes: list[dict] = []
-    cur: list[str] = []
-    cur_dur = 0.0
-    n_img = n_ch = 0
-
-    def flush() -> None:
-        nonlocal cur, cur_dur, n_img
-        if cur:
-            n_img += 1
-            scenes.append({"id": f"S{n_img:02d}", "visual": "", "prompt": "", "lines": cur})
-            cur, cur_dur = [], 0.0
-
+    # 按章节切段：每段是 (章节单元和它要读的句子，开场为 None；[(句子, 时长)])
+    sections: list[tuple[tuple[dict, list[str]] | None, list[tuple[str, float]]]] = [(None, [])]
     for u, texts in pieces:
         if u["kind"] == "chapter":
-            flush()
+            sections.append(((u, texts), []))
+        else:
+            sections[-1][1].extend((t, line_duration(t, voice, rate)) for t in texts)
+    counts = iter(allocate_images(image_count, [[d for _, d in lines] for _, lines in sections if lines])
+                  if image_count else [])
+
+    scenes: list[dict] = []
+    n_img = n_ch = 0
+    for chapter, lines in sections:
+        if chapter:
             n_ch += 1
-            scenes.append(chapter_scene(n_ch, u, texts))
+            scenes.append(chapter_scene(n_ch, *chapter))
+        if not lines:
             continue
-        for t in texts:
-            d = line_duration(t, voice, rate)
-            if cur and (cur_dur >= SCENE_TARGET or cur_dur + d > SCENE_MAX):
-                flush()
-            cur.append(t)
-            cur_dur += d + DEFAULT_PAUSES["line"]
-    flush()
+        durations = [d for _, d in lines]
+        for a, b in even_groups(durations, next(counts)) if image_count else time_groups(durations):
+            n_img += 1
+            scenes.append({"id": f"S{n_img:02d}", "visual": "", "prompt": "", "lines": [t for t, _ in lines[a - 1:b]]})
     return new_storyboard(md_path, voice, rate, aspect, scenes)
 
 
@@ -655,7 +700,7 @@ def build(episode: str, args: argparse.Namespace, verbose: bool = True, fill_mis
         if sb_path.exists():
             shutil.copyfile(sb_path, ep_dir / "storyboard.bak.json")
             print("旧分镜已备份为 storyboard.bak.json")
-        draft = make_draft(episode, md_path, args.voice, args.rate, args.aspect)
+        draft = make_draft(episode, md_path, args.voice, args.rate, args.aspect, getattr(args, "images", None))
         write_json(sb_path, draft)
         print(f"已根据 {md_path.name} 生成分镜草稿：{rel(sb_path)}（visual / prompt 待填写，可用 npm run storyboard 让 AI 来写）")
 
@@ -843,6 +888,9 @@ def build(episode: str, args: argparse.Namespace, verbose: bool = True, fill_mis
     if verbose:
         print()
         print(f"分镜时长（共 {len(scenes_out)} 段）：")
+        image_secs = [s["end"] - s["start"] for s in scenes_out if s["type"] == "image"]
+        # 用 --images 减少张数时每张图本来就停得久，只提示明显比平均长的
+        too_long = max(14.0, 1.6 * sum(image_secs) / len(image_secs)) if image_secs else 14.0
         for s in scenes_out:
             d = s["end"] - s["start"]
             if s["type"] == "chapter":
@@ -850,7 +898,7 @@ def build(episode: str, args: argparse.Namespace, verbose: bool = True, fill_mis
                 continue
             sc = by_id[s["id"]]
             tag = f"复用{sc['reuse']}" if sc.get("reuse") else ("代图" if s["id"] in filled else ("有图" if s["image"] else "缺图"))
-            flag = "  <- 偏长，考虑拆分" if d > 14 else ("  <- 偏短" if d < 2.5 else "")
+            flag = "  <- 偏长，考虑拆分" if d > too_long else ("  <- 偏短" if d < 2.5 else "")
             print(f"  {s['id']:<4} {d:5.1f}s  [{tag}] {(sc.get('visual') or ''.join(sc.get('lines', []))[:18])}{flag}")
     for w in warnings:
         print(f"注意：{w}")
@@ -890,6 +938,7 @@ def main() -> None:
     parser.add_argument("--voice", default="zh-CN-YunyangNeural", help="生成新草稿时使用的音色")
     parser.add_argument("--rate", default="+5%", help="生成新草稿时使用的语速，如 +5%% 或 -10%%")
     parser.add_argument("--aspect", default="9:16", choices=sorted(SIZES), help="生成新草稿时使用的画面比例")
+    parser.add_argument("--images", type=int, help="生成新草稿时，整集只用这么多张图（不加就每 5–10 秒一张）")
     args = parser.parse_args()
     if not re.fullmatch(r"[A-Za-z0-9-]+", args.episode):
         die("集数编号只能包含字母、数字和 -（例如 001）")

@@ -6,6 +6,7 @@
 
     npm run storyboard -- 002            读取根目录下以 002 开头的 .md 文案
     npm run storyboard -- 002 --force    已有分镜时重新生成（旧文件备份为 storyboard.bak.json）
+    npm run storyboard -- 002 --images 20    整集只用 20 张图，每张图对应一段较长的台词
 
 大模型在 .env 里配置（LLM_BASE_URL / LLM_API_KEY / LLM_MODEL），任何兼容 OpenAI 协议的服务都可以。
 模型决定「哪几句合成一个画面」和每个画面的描述、提示词，并标出容易读错的词（用同音字写进 pronunciation，
@@ -32,6 +33,7 @@ from envfile import env, load_env  # noqa: E402
 
 MOTIONS = {"zoomIn", "zoomOut", "panLeft", "panRight", "panUp", "panDown"}
 CHUNK_LINES = 24  # 每次请求最多发送的句子数，长章节会拆成几次
+CHUNK_GROUPS = 12  # 限定张数（--images）时，一段的组数超过这个数才拆成几次请求
 HANZI_RE = re.compile(r"[\u3007\u3400-\u4dbf\u4e00-\u9fff\uf900-\ufaff\U00020000-\U0003134f]+")
 
 PRONOUNCE_PROMPT = """你是播音审校，负责找出语音合成（TTS）容易读错的词，用同音字替换来纠正。替换只影响配音，字幕仍显示原文。
@@ -75,6 +77,13 @@ SYSTEM_PROMPT = """你是短视频分镜师，负责把口播文案拆成画面�
 4. [3.1s] 人口开始增加，村庄逐渐形成。
 输出：
 {"scenes":[{"from":1,"to":2,"visual":"农业出现","prompt":"约一万年前的黄河流域，新石器时代的先民在田里播种粟，手持石锄和石镰，旁边有驯养的猪和狗，温暖的晨光","motion":"zoomIn"},{"from":3,"to":4,"visual":"定居的村落","prompt":"仰韶文化风格的定居村落：半地穴式圆形茅草屋，屋顶升起炊烟，妇女在门前制作彩陶，孩子与家犬嬉戏，村子周围是成片的粟田","motion":"panRight"}]}"""
+
+# 用 --images 限定整集图片张数时，追加在 SYSTEM_PROMPT 后面
+FIXED_COUNT_NOTE = """
+
+本视频限定了图片张数，下面两条代替上面关于每组时长和 prompt 字数的要求：
+- 必须正好分成用户要求的组数，各组时长尽量接近，在话题转折的地方换画面，不受 5–10 秒的限制；不要用 reuse。
+- 每组台词较长，prompt 写 60–120 字：选这组台词里最核心、最有代表性的场景来画，可以包含两三个相关的元素，但只画一个连贯的场景，不要拼贴、分格或画成多个小画面。"""
 
 
 class PlanError(Exception):
@@ -146,42 +155,56 @@ def check_groups(obj, n: int, known: set[str]) -> list[dict]:
     return out
 
 
-def fallback_groups(lines: list[tuple[str, float]]) -> list[dict]:
-    groups, start, dur = [], 1, 0.0
-    for i, (_, d) in enumerate(lines, 1):
-        if i > start and (dur >= be.SCENE_TARGET or dur + d > be.SCENE_MAX):
-            groups.append({"from": start, "to": i - 1, "visual": "", "prompt": "", "reuse": "", "motion": None})
-            start, dur = i, 0.0
-        dur += d + be.DEFAULT_PAUSES["line"]
-    groups.append({"from": start, "to": len(lines), "visual": "", "prompt": "", "reuse": "", "motion": None})
-    return groups
+def fallback_groups(lines: list[tuple[str, float]], count: int | None = None) -> list[dict]:
+    durations = [d for _, d in lines]
+    spans = be.even_groups(durations, count) if count else be.time_groups(durations)
+    return [{"from": a, "to": b, "visual": "", "prompt": "", "reuse": "", "motion": None} for a, b in spans]
 
 
 def plan_chunk(cfg, ctx: str, section: str, lines: list[tuple[str, float]], known: list[tuple[str, str]],
-               warnings: list[str]) -> list[dict]:
+               warnings: list[str], count: int | None = None) -> list[dict]:
+    """让大模型给一段句子分组、写提示词；count 不为空时必须正好分成 count 组。"""
     listing = "\n".join(f"{i}. [{d:.1f}s] {t}" for i, (t, d) in enumerate(lines, 1))
     existing = "，".join(f"{sid} {vis}" for sid, vis in known) or "无"
-    user = f"{ctx}\n\n当前段落：{section}\n已有画面（可以复用）：{existing}\n\n请为下面 {len(lines)} 句分组（编号只在本段内有效）：\n{listing}"
-    messages = [{"role": "system", "content": SYSTEM_PROMPT}, {"role": "user", "content": user}]
+    task = f"请把下面 {len(lines)} 句正好分成 {count} 组" if count else f"请为下面 {len(lines)} 句分组"
+    user = f"{ctx}\n\n当前段落：{section}\n已有画面（可以复用）：{existing}\n\n{task}（编号只在本段内有效）：\n{listing}"
+    system = SYSTEM_PROMPT + FIXED_COUNT_NOTE if count else SYSTEM_PROMPT
+    messages = [{"role": "system", "content": system}, {"role": "user", "content": user}]
     last_error = ""
     for _ in range(2):
         content = ""
         try:
             content = ask(cfg, messages)
-            return check_groups(extract_json(content), len(lines), {sid for sid, _ in known})
+            groups = check_groups(extract_json(content), len(lines), {sid for sid, _ in known})
+            if count and len(groups) != count:
+                raise PlanError(f"要求正好分成 {count} 组，实际分成了 {len(groups)} 组")
+            return groups
         except PlanError as err:
             last_error = str(err)
             if content:
                 messages += [{"role": "assistant", "content": content},
                              {"role": "user", "content": f"上面的输出有问题：{err}。请按要求重新输出完整的 JSON。"}]
-    if len(lines) > 4:
+    if len(lines) > 4 and count != 1:
         half = len(lines) // 2
-        return plan_chunk(cfg, ctx, section, lines[:half], known, warnings) + [
+        first, second = lines[:half], lines[half:]
+        n1, n2 = be.allocate_images(count, [[d for _, d in first], [d for _, d in second]]) if count else (None, None)
+        return plan_chunk(cfg, ctx, section, first, known, warnings, n1) + [
             {**g, "from": g["from"] + half, "to": g["to"] + half}
-            for g in plan_chunk(cfg, ctx, section, lines[half:], known, warnings)
+            for g in plan_chunk(cfg, ctx, section, second, known, warnings, n2)
         ]
     warnings.append(f"「{section}」有 {len(lines)} 句没能让模型分好（{last_error}），已按时长自动分组，提示词需要补写")
-    return fallback_groups(lines)
+    return fallback_groups(lines, count)
+
+
+def chunk_section(lines: list[tuple[str, float]], want: int | None) -> list[tuple[list[tuple[str, float]], int | None]]:
+    """把一段的句子切成几次请求，返回 [(句子, 这次要分成的组数)]。
+    want 是这一段限定的画面数（--images），为空时不限定，每次最多 CHUNK_LINES 句；
+    限定时组数少，整段一起发给模型才能把各组时长分匀，只在组数超过 CHUNK_GROUPS 时才拆开。"""
+    parts = math.ceil(len(lines) / CHUNK_LINES) if want is None else math.ceil(want / CHUNK_GROUPS)
+    size = math.ceil(len(lines) / parts)
+    chunks = [c for c in (lines[k * size:(k + 1) * size] for k in range(parts)) if c]
+    counts = be.allocate_images(want, [[d for _, d in c] for c in chunks]) if want is not None else [None] * len(chunks)
+    return list(zip(chunks, counts))
 
 
 def syllables(text: str) -> list[str]:
@@ -252,12 +275,22 @@ def find_pronunciation(cfg, heading: str, text: str, warnings: list[str]) -> dic
     return {}
 
 
-def create_storyboard(episode: str, md_path: Path, voice: str, rate: str, aspect: str) -> int:
-    """标出容易读错的词 → 配音（用于统计时长）→ 大模型分组写提示词 → 写入 storyboard.json。返回原本就在 images 里的图片数。"""
+def create_storyboard(episode: str, md_path: Path, voice: str, rate: str, aspect: str,
+                      image_count: int | None = None) -> int:
+    """标出容易读错的词 → 配音（用于统计时长）→ 大模型分组写提示词 → 写入 storyboard.json。返回原本就在 images 里的图片数。
+    image_count 不为空时，整集正好分成这么多个画面（--images）。"""
     cfg = require_llm()
     ep_dir = be.EPISODES_DIR / episode
     sb_path = ep_dir / "storyboard.json"
     pieces = be.script_pieces(md_path)
+    if image_count is not None:  # 先检查张数，免得调用了大模型才发现不行
+        sizes = [0]
+        for unit, texts in pieces:
+            if unit["kind"] == "chapter":
+                sizes.append(0)
+            else:
+                sizes[-1] += len(texts)
+        be.check_image_count(image_count, [n for n in sizes if n])
     title, subtitle = be.titles_from_filename(md_path)
     heading = f"{title}{'——' + subtitle if subtitle else ''}"
     full_text = "\n".join(t for _, ts in pieces for t in ts)
@@ -279,27 +312,27 @@ def create_storyboard(episode: str, md_path: Path, voice: str, rate: str, aspect
         else:
             current += [(t, be.line_duration(spoken[t], voice, rate)) for t in texts]
     sections.append((name, chapter_unit, current))
+    wants = iter(be.allocate_images(image_count, [[d for _, d in lines] for _, _, lines in sections if lines])
+                 if image_count is not None else [])
+    batches = [(name, chapter, chunk_section(lines, next(wants, None)) if lines else [])
+               for name, chapter, lines in sections]
 
     ctx = f"视频标题：{heading}\n完整文案（只用来理解上下文）：\n{full_text[:8000]}"
-    total_calls = sum(math.ceil(len(lines) / CHUNK_LINES) for _, _, lines in sections if lines)
+    total_calls = sum(len(chunks) for _, _, chunks in batches)
     print(f"正在用 {env('LLM_MODEL')} 写分镜（共 {total_calls} 段，每段通常需要 10–60 秒）…")
 
     scenes: list[dict] = []
     known: list[tuple[str, str]] = []
     n_img = n_ch = call = 0
-    for name, chapter, lines in sections:
+    for name, chapter, chunks in batches:
         if chapter:
             n_ch += 1
             scenes.append(be.chapter_scene(n_ch, chapter["unit"], chapter["texts"]))
-        if not lines:
-            continue
-        parts = math.ceil(len(lines) / CHUNK_LINES)
-        size = math.ceil(len(lines) / parts)
-        for k in range(parts):
-            chunk = lines[k * size:(k + 1) * size]
+        for chunk, count in chunks:
             call += 1
             started = time.time()
-            groups = plan_chunk(cfg, ctx, name, chunk, known, warnings)
+            # 限定张数时不复用前面的图，每个画面都有自己的图
+            groups = plan_chunk(cfg, ctx, name, chunk, known if count is None else [], warnings, count)
             for g in groups:
                 n_img += 1
                 sid = f"S{n_img:02d}"
@@ -326,6 +359,10 @@ def create_storyboard(episode: str, md_path: Path, voice: str, rate: str, aspect
     images = [s for s in scenes if s.get("type") != "chapter"]
     reused = sum(1 for s in images if s.get("reuse"))
     print(f"已写好分镜：{be.rel(sb_path)}（{len(images)} 个画面，其中 {reused} 个复用前面的图，需要出图 {len(images) - reused} 张）")
+    if image_count is not None:
+        seconds = sum(d for _, _, lines in sections for _, d in lines) / len(images)
+        print(f"平均每张图停留约 {seconds:.0f} 秒"
+              + ("。停留超过 30 秒时，镜头推拉会慢到几乎看不出来，可以适当增加 --images" if seconds > 30 else ""))
     if pron:
         print(f"上面改读同音字的 {len(pron)} 个词写在 storyboard.json 的 pronunciation 里，建议在预览里听一下；"
               f"读得不对就修改或删掉，再运行 npm run voice -- {episode}")
@@ -352,6 +389,7 @@ def main() -> None:
     parser.add_argument("--voice", default="zh-CN-YunyangNeural", help="配音音色")
     parser.add_argument("--rate", default="+5%", help="语速，如 +5%% 或 -10%%")
     parser.add_argument("--aspect", default="9:16", choices=sorted(be.SIZES), help="画面比例")
+    parser.add_argument("--images", type=int, help="整集只用这么多张图（每张图对应一段较长的台词），不加就每 5–10 秒一张")
     args = parser.parse_args()
     if not re.fullmatch(r"[A-Za-z0-9-]+", args.episode):
         be.die("集数编号只能包含字母、数字和 -（例如 002）")
@@ -365,7 +403,7 @@ def main() -> None:
     if not shutil.which("ffmpeg"):
         be.die("没有找到 ffmpeg，请先安装（例如 winget install Gyan.FFmpeg）")
 
-    stale_images = create_storyboard(args.episode, md_path, args.voice, args.rate, args.aspect)
+    stale_images = create_storyboard(args.episode, md_path, args.voice, args.rate, args.aspect, args.images)
     be.build(args.episode, argparse.Namespace(script=args.script, redraft=False, voice=args.voice,
                                               rate=args.rate, aspect=args.aspect))
     print(f"建议先打开 public/episodes/{args.episode}/prompts.md 看一遍画面描述，不满意的地方可以直接改 storyboard.json 或让 AI 改。")

@@ -7,6 +7,7 @@
     npm run make -- 002                    用根目录下 002 开头的文案做出 out/002.mp4
     npm run make -- 002 --provider ark     指定生图平台
     npm run make -- 002 --max-cost 30      出图费用上限（默认 20 元）
+    npm run make -- 002 --images 20        新写分镜时整集只用 20 张图
 
 已经完成的步骤会跳过（已有分镜、已有图片），中途中断后重新运行即可接着做。
 """
@@ -85,6 +86,7 @@ def main() -> None:
     parser.add_argument("--voice", default="zh-CN-YunyangNeural", help="新写分镜时使用的配音音色")
     parser.add_argument("--rate", default="+5%", help="新写分镜时使用的语速，如 +5%% 或 -10%%")
     parser.add_argument("--aspect", default="9:16", choices=sorted(be.SIZES), help="新写分镜时使用的画面比例")
+    parser.add_argument("--images", type=int, help="新写分镜时，整集只用这么多张图（不加就每 5–10 秒一张）")
     args = parser.parse_args()
     if not re.fullmatch(r"[A-Za-z0-9-]+", args.episode):
         be.die("集数编号只能包含字母、数字和 -（例如 002）")
@@ -118,9 +120,11 @@ def main() -> None:
     stage(1, "写分镜")
     stale_images = 0
     if need_storyboard:
-        stale_images = gs.create_storyboard(episode, md_path, args.voice, args.rate, args.aspect)
+        stale_images = gs.create_storyboard(episode, md_path, args.voice, args.rate, args.aspect, args.images)
     else:
-        print(f"已有分镜 {be.rel(sb_path)}，跳过。想让大模型重写，先运行 npm run storyboard -- {episode} --force")
+        redo = f"npm run storyboard -- {episode} --force" + (f" --images {args.images}" if args.images is not None else "")
+        print(f"已有分镜 {be.rel(sb_path)}，跳过{'（--images 只在新写分镜时生效）' if args.images is not None else ''}。"
+              f"想让大模型重写，先运行 {redo}")
 
     stage(2, "配音、字幕、时间线")
     be.build(episode, build_args(args), verbose=False)

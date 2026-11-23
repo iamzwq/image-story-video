@@ -131,11 +131,12 @@ npm run make -- <集数> [参数]
 | `--max-cost <元>` | 出图费用上限，预计超过时在花钱之前停止 | `20` |
 | `--output <路径>` | 成片保存位置 | `out/<集数>.mp4` |
 | `--workers <数量>` | 出图时同时发出的请求数 | `2` |
-| `--voice`、`--rate`、`--aspect` | 新写分镜时使用的音色、语速、画面比例，已有分镜时不生效 | 同 storyboard |
+| `--voice`、`--rate`、`--aspect`、`--images` | 新写分镜时使用的音色、语速、画面比例、图片张数，已有分镜时不生效 | 同 storyboard |
 
 ```powershell
 npm run make -- 002                    # 最常用的写法
 npm run make -- 002 --provider ark     # 用火山方舟出图
+npm run make -- 002 --images 20        # 整集只用 20 张图，少花出图费
 npm run make -- 001                    # 001 已有分镜，只出图和导出
 ```
 
@@ -155,6 +156,7 @@ npm run storyboard -- <集数> [参数]
 | `--voice <音色>` | 配音音色，写进新分镜 | `zh-CN-YunyangNeural` |
 | `--rate <语速>` | 语速，如 `+10%`；放慢时带等号写成 `--rate=-10%` | `+5%` |
 | `--aspect <比例>` | 画面比例：`9:16`、`16:9`、`1:1`、`3:4` | `9:16` |
+| `--images <张数>` | 整集只用这么多张图，每张图对应一段较长的台词，提示词会概括这段台词的核心场景。开场和每个章节至少各要 1 张。张数越少，每张图停得越久，超过 30 秒时镜头推拉几乎看不出来，7 分钟的视频建议不少于 15 张 | 不限，每 5–10 秒一张 |
 
 ```powershell
 npm run storyboard -- 002                              # 最常用的写法
@@ -175,7 +177,7 @@ npm run voice -- <集数> [参数]
 | `<集数>` | 必填 | — |
 | `--script <路径>` | 手动指定文案文件 | 自动查找 |
 | `--redraft` | 按文案重新生成一份按时长分组的草稿，提示词会清空。旧文件备份为 storyboard.bak.json；分镜编号会重新排列 | 不覆盖 |
-| `--voice`、`--rate`、`--aspect` | 同 storyboard，只在生成新草稿时生效。分镜已经存在时，请直接改 storyboard.json 里的 `voice`、`rate`、`aspect` | 同上 |
+| `--voice`、`--rate`、`--aspect`、`--images` | 同 storyboard，只在生成新草稿时生效。分镜已经存在时，音色、语速、比例请直接改 storyboard.json 里的 `voice`、`rate`、`aspect` | 同上 |
 
 ```powershell
 npm run voice -- 001             # 改完 storyboard.json 后刷新，配音有缓存，通常几秒完成
@@ -355,6 +357,8 @@ npm run lint                                                       # 检查视�
 **一键生成后有几个画面是重复的？** 那些分镜的图片没能生成（通常是没通过内容审核），暂时用了相邻画面，运行结束时会列出编号。修改它们的 `prompt` 后，运行 `npm run images -- 002 --only 编号`，再运行 `npm run render -- ep002`。
 
 **想换个平台或画风，把图全部重画？** 改好 `imageStyle` 或选好平台后，运行 `npm run images -- 002 --force`（加 `--provider` 指定平台）。所有图都会重新生成、重新收费。
+
+**想少出几张图、省点钱？** 新写分镜时加 `--images`，例如 `npm run make -- 002 --images 20`，整集只用 20 张图，每张图对应一段较长的台词。已经有分镜的集数，要先运行 `npm run storyboard -- 002 --force --images 20` 重写分镜；分镜编号会重新排列，原来的图片对不上，要删掉重画。
 
 **想做历史以外的题材？** 默认的画风、音色和分镜提示词都是按历史题材调的，换题材时建议改三处：
 
