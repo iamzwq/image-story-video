@@ -4,7 +4,7 @@
 # ///
 """用大模型把口播文案写成分镜（storyboard.json），然后自动配音、生成时间线和出图提示词。
 
-    npm run storyboard -- 002            读取根目录下以 002 开头的 .md 文案
+    npm run storyboard -- 002            读取 texts/ 里以 002 开头的 .md 文案
     npm run storyboard -- 002 --force    已有分镜时重新生成（旧文件备份为 storyboard.bak.json）
     npm run storyboard -- 002 --images 20    整集只用 20 张图，每张图对应一段较长的台词
     npm run storyboard -- 002 --style    给已有的分镜按内容重新推荐画风（只改 imageStyle）
@@ -619,7 +619,7 @@ def create_storyboard(episode: str, md_path: Path, voice: str, rate: str, aspect
 def find_md(episode: str, script: str | None) -> Path:
     md_path = be.find_script(episode, script)
     if md_path is None or not md_path.exists():
-        be.die(f"没找到第 {episode} 集的文案：请把文案放在项目根目录，文件名以 {episode} 开头，或用 --script 指定")
+        be.die(be.missing_script(episode))
     return md_path
 
 
@@ -629,7 +629,7 @@ def main() -> None:
         sys.stderr.reconfigure(errors="replace")
     parser = argparse.ArgumentParser(description="用大模型把口播文案写成分镜")
     parser.add_argument("episode", help="集数编号，例如 002")
-    parser.add_argument("--script", help="文案 .md 路径（默认自动找根目录下以集数编号开头的 .md）")
+    parser.add_argument("--script", help="文案 .md 路径（默认自动找 texts/ 里以集数编号开头的 .md）")
     parser.add_argument("--force", action="store_true", help="已有 storyboard.json 时重新生成（旧文件会备份）")
     parser.add_argument("--voice", default="zh-CN-YunyangNeural", help="配音音色")
     parser.add_argument("--rate", default="+5%", help="语速，如 +5%% 或 -10%%")

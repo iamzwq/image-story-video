@@ -35,6 +35,7 @@ from pathlib import Path
 import edge_tts
 
 ROOT = Path(__file__).resolve().parent.parent
+SCRIPTS_DIR = ROOT / "texts"
 EPISODES_DIR = ROOT / "public" / "episodes"
 CACHE_DIR = ROOT / ".cache" / "tts"
 NARRATION_CACHE = ROOT / ".cache" / "narration"  # 每集的 narration.wav 是按哪些台词和停顿拼出来的
@@ -179,8 +180,16 @@ def find_script(episode: str, explicit: str | None) -> Path | None:
     if explicit:
         p = Path(explicit)
         return p if p.is_absolute() else (Path.cwd() / p)
-    found = sorted(p for p in ROOT.glob(f"{episode}*.md") if p.is_file())
-    return found[0] if found else None
+    for folder in (SCRIPTS_DIR, ROOT):  # 根目录：兼容旧的存放位置
+        found = sorted(p for p in folder.glob(f"{episode}*.md") if p.is_file())
+        if found:
+            return found[0]
+    return None
+
+
+def missing_script(episode: str) -> str:
+    return (f"没找到第 {episode} 集的文案：请把文案放进 {SCRIPTS_DIR.name}/ 文件夹，"
+            f"文件名以 {episode} 开头（如 {episode}.标题.md），或用 --script 指定")
 
 
 # ---------------------------------------------------------------- 配音（edge-tts，按句缓存）
@@ -845,7 +854,7 @@ def build(episode: str, args: argparse.Namespace, verbose: bool = True, fill_mis
     stale_images = 0
     if args.redraft or not sb_path.exists():
         if md_path is None or not md_path.exists():
-            die(f"没找到第 {episode} 集的文案：请把文案放在项目根目录，文件名以 {episode} 开头（如 {episode}.标题.md），或用 --script 指定")
+            die(missing_script(episode))
         ep_dir.mkdir(parents=True, exist_ok=True)
         stale_images = count_images(ep_dir)
         if sb_path.exists():
@@ -1119,7 +1128,7 @@ def main() -> None:
         sys.stderr.reconfigure(errors="replace")
     parser = argparse.ArgumentParser(description="口播文案 → 配音 + 字幕 + 分镜时间线")
     parser.add_argument("episode", help="集数编号，例如 001")
-    parser.add_argument("--script", help="文案 .md 路径（默认自动找根目录下以集数编号开头的 .md）")
+    parser.add_argument("--script", help="文案 .md 路径（默认自动找 texts/ 里以集数编号开头的 .md）")
     parser.add_argument("--redraft", action="store_true", help="按文案重新生成分镜草稿（覆盖 storyboard.json，旧文件备份）")
     parser.add_argument("--voice", default="zh-CN-YunyangNeural", help="生成新草稿时使用的音色")
     parser.add_argument("--rate", default="+5%", help="生成新草稿时使用的语速，如 +5%% 或 -10%%")

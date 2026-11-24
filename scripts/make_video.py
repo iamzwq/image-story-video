@@ -87,7 +87,7 @@ def main() -> None:
         sys.stderr.reconfigure(errors="replace")
     parser = argparse.ArgumentParser(description="一键生成：文案 → 分镜 → 配音 → 出图 → 导出视频")
     parser.add_argument("episode", help="集数编号，例如 002")
-    parser.add_argument("--script", help="文案 .md 路径（默认自动找根目录下以集数编号开头的 .md）")
+    parser.add_argument("--script", help="文案 .md 路径（默认自动找 texts/ 里以集数编号开头的 .md）")
     parser.add_argument("--provider", help="生图平台：bailian 或 ark，默认读 .env 的 IMAGE_PROVIDER")
     parser.add_argument("--max-cost", type=float, default=20.0, help="出图费用上限（元），预计超过时在花钱前停止，默认 20")
     parser.add_argument("--output", help="成片保存位置，默认 out/<集数>.mp4")
