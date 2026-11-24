@@ -4,7 +4,7 @@
 # ///
 """一键生成：文案 → 分镜 → 配音 → 出图 → 导出视频，中途不需要人工操作。
 
-    npm run make -- 002                    用根目录下 002 开头的文案做出 out/002.mp4
+    npm run make -- 002                    用 texts/ 里 002 开头的文案做出 out/002.mp4 和封面 out/002-cover.jpg
     npm run make -- 002 --provider ark     指定生图平台
     npm run make -- 002 --max-cost 30      出图费用上限（默认 20 元）
     npm run make -- 002 --images 20        新写分镜时整集只用 20 张图
@@ -25,10 +25,11 @@ sys.path.insert(0, str(Path(__file__).resolve().parent))
 import build_episode as be  # noqa: E402
 import gen_images as gi  # noqa: E402
 import gen_storyboard as gs  # noqa: E402
+import make_cover as mc  # noqa: E402
 from api_common import llm_settings, missing_llm_vars  # noqa: E402
 from envfile import load_env  # noqa: E402
 
-REMOTION_CLI = be.ROOT / "node_modules" / "@remotion" / "cli" / "remotion-cli.js"
+REMOTION_CLI = mc.REMOTION_CLI
 
 
 def stage(n: int, title: str) -> None:
@@ -158,12 +159,18 @@ def main() -> None:
     result = subprocess.run([node, str(REMOTION_CLI), "render", f"ep{episode}", str(output)], cwd=be.ROOT)
     if result.returncode != 0 or not output.exists():
         be.die("导出视频失败，请查看上面的报错信息")
+    cover = output.with_name(f"{output.stem}-cover.jpg")
+    if not mc.render_cover(episode, cover, node):
+        print(f"注意：封面生成失败（视频不受影响），可以稍后运行 npm run cover -- {episode} 重试")
+        cover = None
 
     minutes = (time.time() - started) / 60
     duration = file_duration(output)
     print("\n========== 完成 ==========")
     print(f"成片：{be.rel(output)}（{output.stat().st_size / 1024 / 1024:.0f} MB"
           + (f"，时长 {int(duration // 60)} 分 {duration % 60:.0f} 秒" if duration else "") + "）")
+    if cover:
+        print(f"封面：{be.rel(cover)}")
     print(f"用时：{minutes:.1f} 分钟")
     if images_result["done"]:
         cost = f"，约 {images_result['spent']:.2f} 元" if images_result["spent"] else ""

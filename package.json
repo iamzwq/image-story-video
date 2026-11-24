@@ -10,6 +10,7 @@
     "storyboard": "uv run scripts/gen_storyboard.py",
     "voice": "uv run scripts/build_episode.py",
     "images": "uv run scripts/gen_images.py",
+    "cover": "uv run scripts/make_cover.py",
     "render": "remotion render",
     "lint": "tsc"
   },

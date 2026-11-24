@@ -2,7 +2,7 @@
 
 把一篇口播文案自动做成「配音 + 图片 + 字幕」的竖屏视频（1080×1920）。视频以配音为时间轴：先配音，再按每句话的时长安排字幕和图片。
 
-**流程**：文案 .md → 分镜（storyboard）→ 配音、字幕、时间线（voice）→ 出图（images）→ 导出 MP4（render）。`npm run make` 一条命令全部完成，也可以分步执行。
+**流程**：文案 .md → 分镜（storyboard）→ 配音、字幕、时间线（voice）→ 出图（images）→ 导出 MP4（render）和封面（cover）。`npm run make` 一条命令全部完成，也可以分步执行。
 
 ## 适合做什么视频
 
@@ -39,7 +39,7 @@
 npm run make -- 002
 ```
 
-大模型写分镜 → 配音 → 出图 → 导出，成片在 `out/002.mp4`。7 分钟左右的视频大约要 15–30 分钟，出图约 5–10 元。中途断了重新运行同一条命令即可，做完的部分不会重做、不会重复花钱。
+大模型写分镜 → 配音 → 出图 → 导出，成片在 `out/002.mp4`，封面在 `out/002-cover.jpg`。7 分钟左右的视频大约要 15–30 分钟，出图约 5–10 元。中途断了重新运行同一条命令即可，做完的部分不会重做、不会重复花钱。
 
 文案可以用纯文字或 Markdown：
 
@@ -54,8 +54,8 @@ npm run make -- 002
 | 1. 写分镜 | `npm run storyboard -- 002` | 写完自动生成配音、字幕和 `prompts.md` |
 | 2. 检查、修改 | 看 `public/episodes/002/prompts.md`；改了 `storyboard.json` 就运行 `npm run voice -- 002` | 见「[修改视频内容](#修改视频内容)」 |
 | 3. 出图 | `npm run images -- 002 --pilot` 先试 4 张，满意后 `npm run images -- 002` | 第一次可以加 `--compare` 对比平台或模型 |
-| 4. 预览 | `npm run dev` | 浏览器左侧选 `ep002`，按空格播放 |
-| 5. 导出 | `npm run render -- ep002` | 成片在 `out/002.mp4` |
+| 4. 预览 | `npm run dev` | 浏览器左侧选 `ep002`，按空格播放；`ep002-cover` 是封面 |
+| 5. 导出 | `npm run render -- ep002`，封面 `npm run cover -- 002` | 成片在 `out/002.mp4`，封面在 `out/002-cover.jpg` |
 
 - **没配置大模型**：可以让 AI 助手写分镜（001 就是这样写的），或者运行 `npm run voice -- 002` 按配音时长生成草稿，再自己填写 `imageStyle`（画风）和每个分镜的 `visual`、`prompt`。
 - **不用生图 API**：把 `prompts.md` 里的提示词复制到[即梦](https://jimeng.jianying.com/)、[豆包](https://www.doubao.com/)等网页工具，出 9:16 竖图，按分镜编号命名（`S01.jpg`……）放进 `public/episodes/002/images/`，再运行 `npm run voice -- 002`。
@@ -67,13 +67,13 @@ npm run make -- 002
 
 ### npm run make：一键生成
 
-依次执行：检查工具和 API Key → 写分镜（已有就跳过）→ 配音和时间线 → 给缺图的分镜出图（不询问费用，预计超过上限时在花钱前停止；被审核拦下的让大模型改写提示词重试一次）→ 导出。仍然缺图的分镜暂时用相邻画面代替，结束时会列出编号。
+依次执行：检查工具和 API Key → 写分镜（已有就跳过）→ 配音和时间线 → 给缺图的分镜出图（不询问费用，预计超过上限时在花钱前停止；被审核拦下的让大模型改写提示词重试一次）→ 导出 → 生成封面。仍然缺图的分镜暂时用相邻画面代替，结束时会列出编号。
 
 | 参数 | 作用 | 默认 |
 | --- | --- | --- |
 | `--provider <平台>` | 生图平台，写法同 images | `.env` 的 `IMAGE_PROVIDER` |
 | `--max-cost <元>` | 出图费用上限 | `20` |
-| `--output <路径>` | 成片保存位置 | `out/<集数>.mp4` |
+| `--output <路径>` | 成片保存位置，封面存在同一个文件夹（`<文件名>-cover.jpg`） | `out/<集数>.mp4` |
 | `--workers <数量>` | 出图时同时发出的请求数 | `2` |
 | `--script`、`--voice`、`--rate`、`--aspect`、`--images` | 同 storyboard，只在新写分镜时生效 | — |
 
@@ -145,7 +145,9 @@ npm run render -- ep001                              # 导出到 out/001.mp4
 npm run render -- ep001 out/001-v2.mp4               # 指定文件名
 npm run render -- ep001 --frames=0-899               # 只导出前 30 秒，快速检查
 npm run render -- ep001 --scale=0.5                  # 半分辨率，适合发样片
-npx remotion still ep001 out/cover.png --frame=60    # 导出第 2 秒的画面当封面
+npm run cover -- 001                                 # 生成封面 out/001-cover.jpg：第一个画面 + 黑底白字标题（样式在 src/Cover.tsx）
+npm run cover -- 001 --output out/001-cover.png      # 指定文件名，可以是 .jpg 或 .png
+npx remotion still ep001 out/frame.png --frame=60    # 导出第 2 秒的画面
 uvx --from edge-tts edge-tts --list-voices | Select-String zh-CN   # 查看中文音色
 npm run lint                                         # 改过 src/ 之后检查视频模板代码
 ```
@@ -220,11 +222,11 @@ npm run lint                                         # 改过 src/ 之后检查�
 | `public/episodes/<集数>/images/` | 图片，按分镜编号命名；`cast/` 里是角色定妆图；`_generated.json` 记录每张图是怎么生成的 |
 | `public/episodes/<集数>/compare/` | `--compare` 的对比图，选定后可以删掉 |
 | `public/episodes/<集数>/` 里的其他文件 | 配音、时间线、字幕和 `prompts.md`，都是自动生成的，不要手改 |
-| `out/` | 导出的成片 |
+| `out/` | 导出的成片和封面 |
 | `.env`、`.env.example` | 你的 API Key 和配置模板 |
 | `remotion.env` | 预览和导出读取的环境变量文件，保持为空 |
-| `scripts/` | `make_video.py` 一键生成，`gen_storyboard.py` 写分镜，`build_episode.py` 配音和时间线，`gen_images.py` 出图 |
-| `src/` | Remotion 视频模板 |
+| `scripts/` | `make_video.py` 一键生成，`gen_storyboard.py` 写分镜，`build_episode.py` 配音和时间线，`gen_images.py` 出图，`make_cover.py` 封面 |
+| `src/` | Remotion 视频模板，封面样式在 `Cover.tsx` |
 | `public/fonts/` | 思源黑体、思源宋体（SIL OFL 协议，可免费商用） |
 
 ## 常见问题

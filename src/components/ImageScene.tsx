@@ -4,7 +4,7 @@ import { SANS, SERIF } from "../fonts";
 import type { ImageScene as ImageSceneData, Motion } from "../types";
 
 // 缓慢推拉/平移（Ken Burns），让静态图有镜头感。x/y 为百分比位移，放大 1.15 倍时 ±4% 不会露边
-const MOTIONS: Record<Motion, { scale: [number, number]; x: [number, number]; y: [number, number] }> = {
+export const MOTIONS: Record<Motion, { scale: [number, number]; x: [number, number]; y: [number, number] }> = {
   zoomIn: { scale: [1, 1.15], x: [0, 0], y: [0, 0] },
   zoomOut: { scale: [1.15, 1], x: [0, 0], y: [0, 0] },
   panLeft: { scale: [1.15, 1.15], x: [-4, 4], y: [0, 0] },

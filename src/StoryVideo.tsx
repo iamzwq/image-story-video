@@ -6,9 +6,12 @@ import { Captions } from "./components/Captions";
 import { ChapterCard } from "./components/ChapterCard";
 import { ImageScene } from "./components/ImageScene";
 import { Overlay } from "./components/Overlay";
+import { Cover } from "./Cover";
 import type { StoryProps } from "./types";
 
 const FADE_SECONDS = 0.4;
+// 视频开头放几帧封面：1 帧观众看不到，但平台默认取第一帧当封面时就是它；改成 0 就不放
+const COVER_FRAMES = 1;
 
 const FadeIn: React.FC<{ frames: number; children: React.ReactNode }> = ({ frames, children }) => {
   const frame = useCurrentFrame();
@@ -17,7 +20,7 @@ const FadeIn: React.FC<{ frames: number; children: React.ReactNode }> = ({ frame
   return <AbsoluteFill style={{ opacity }}>{children}</AbsoluteFill>;
 };
 
-export const StoryVideo: React.FC<StoryProps> = ({ timeline }) => {
+export const StoryVideo: React.FC<StoryProps> = ({ episode, timeline }) => {
   const { fps } = useVideoConfig();
   if (!timeline) {
     return <AbsoluteFill style={{ backgroundColor: "#000" }} />;
@@ -46,6 +49,11 @@ export const StoryVideo: React.FC<StoryProps> = ({ timeline }) => {
       })}
       <Overlay timeline={timeline} />
       <Captions captions={timeline.captions} />
+      {COVER_FRAMES > 0 ? (
+        <Sequence name="封面" durationInFrames={COVER_FRAMES}>
+          <Cover episode={episode} timeline={timeline} />
+        </Sequence>
+      ) : null}
       <Audio src={staticFile(timeline.audio)} name="配音" />
       {timeline.bgm ? <Bgm src={timeline.bgm.src} volume={timeline.bgm.volume} /> : null}
     </AbsoluteFill>
