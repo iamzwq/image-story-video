@@ -39,7 +39,7 @@ def image_args(args: argparse.Namespace) -> argparse.Namespace:
     return argparse.Namespace(
         episode=args.episode, provider=args.provider, only=None, pilot=0, force=False, compare=False,
         yes=True, dry_run=False, auto_fix=True, max_cost=args.max_cost, workers=args.workers,
-        keep_png=False, rebuild=False,
+        keep_png=False, rebuild=False, no_refs=False,
     )
 
 
@@ -60,6 +60,15 @@ def check_prompts(episode: str, missing: list[dict]) -> None:
         be.die(
             f"分镜里还没有出图提示词（可能是 npm run voice 生成的草稿），没法自动出图。\n"
             f"  可以运行 npm run storyboard -- {episode} --force 让大模型重写分镜，或者让 AI 助手补上提示词，再重新运行。"
+        )
+
+
+def check_style(episode: str, missing: list[dict]) -> None:
+    sb = be.load_storyboard(be.EPISODES_DIR / episode / "storyboard.json")
+    if missing and not (sb.get("imageStyle") or "").strip():
+        be.die(
+            f"分镜里还没有画风（imageStyle 是空的），没法出图。\n"
+            f"  运行 npm run storyboard -- {episode} --style 让大模型按内容推荐一个，或者自己填写，再重新运行。"
         )
 
 
@@ -112,6 +121,7 @@ def main() -> None:
                "  也可以先让 AI 助手写好分镜，再运行这个命令。")
     missing = [] if need_storyboard else missing_images(episode)
     check_prompts(episode, missing)
+    check_style(episode, missing)
     if need_storyboard or missing:
         gi.pick_providers(image_args(args))
     if llm_settings() is None:
@@ -121,6 +131,7 @@ def main() -> None:
     stale_images = 0
     if need_storyboard:
         stale_images = gs.create_storyboard(episode, md_path, args.voice, args.rate, args.aspect, args.images)
+        check_style(episode, missing_images(episode))
     else:
         redo = f"npm run storyboard -- {episode} --force" + (f" --images {args.images}" if args.images is not None else "")
         print(f"已有分镜 {be.rel(sb_path)}，跳过{'（--images 只在新写分镜时生效）' if args.images is not None else ''}。"
@@ -156,7 +167,8 @@ def main() -> None:
     print(f"用时：{minutes:.1f} 分钟")
     if images_result["done"]:
         cost = f"，约 {images_result['spent']:.2f} 元" if images_result["spent"] else ""
-        print(f"本次出图：{images_result['done']} 张{cost}（参考值，以平台账单为准）")
+        sheets = f"（另画了 {images_result['sheets']} 张角色定妆图）" if images_result.get("sheets") else ""
+        print(f"本次出图：{images_result['done']} 张{sheets}{cost}（参考值，以平台账单为准）")
     if images_result["fixed"]:
         print(f"提示词被大模型改写后才通过审核的分镜：{', '.join(images_result['fixed'])}")
     if info["filled"]:

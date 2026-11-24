@@ -76,7 +76,10 @@ export const ImageScene: React.FC<{ scene: ImageSceneData; index: number; durati
     <AbsoluteFill style={{ overflow: "hidden" }}>
       <AbsoluteFill style={{ transform: `scale(${at(motion.scale)}) translate(${at(motion.x)}%, ${at(motion.y)}%)` }}>
         {scene.image ? (
-          <Img src={staticFile(scene.image)} style={{ width: "100%", height: "100%", objectFit: "cover" }} />
+          <Img
+            src={staticFile(scene.image)}
+            style={{ width: "100%", height: "100%", objectFit: "cover" }}
+          />
         ) : (
           <Placeholder scene={scene} index={index} />
         )}

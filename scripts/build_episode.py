@@ -21,12 +21,15 @@ import asyncio
 import hashlib
 import json
 import math
+import os
 import re
 import shutil
 import subprocess
 import sys
+import threading
 import wave
 from array import array
+from concurrent.futures import ThreadPoolExecutor
 from pathlib import Path
 
 import edge_tts
@@ -34,9 +37,11 @@ import edge_tts
 ROOT = Path(__file__).resolve().parent.parent
 EPISODES_DIR = ROOT / "public" / "episodes"
 CACHE_DIR = ROOT / ".cache" / "tts"
+NARRATION_CACHE = ROOT / ".cache" / "narration"  # 每集的 narration.wav 是按哪些台词和停顿拼出来的
 REGISTRY = ROOT / "src" / "episodes.json"
 
 SAMPLE_RATE = 24000
+CLIP_CACHE_VERSION = 1  # 改了 trim_silence 的裁剪规则就加一，让缓存里每句配音的时长重新计算
 IMAGE_EXTS = (".png", ".jpg", ".jpeg", ".webp")
 MOTIONS = ("zoomIn", "panRight", "zoomOut", "panLeft", "panUp", "zoomIn", "panDown")
 SIZES = {"9:16": (1080, 1920), "16:9": (1920, 1080), "1:1": (1080, 1080), "3:4": (1080, 1440)}
@@ -44,13 +49,11 @@ ASPECT_HINT = {"9:16": "竖版9:16构图", "16:9": "横版16:9构图", "1:1": "�
 DEFAULT_PAUSES = {"line": 0.35, "scene": 0.5, "chapterBefore": 0.6, "chapterAfter": 0.6, "end": 1.5}
 TARGET_LUFS = -16.0  # loudnorm 的目标；动态模式下单声道配音实际约 -18，Remotion 输出双声道后成片约 -15 LUFS
 TRUE_PEAK = -3.0  # 给 AAC 编码的峰值过冲留余量，避免成片削波
-DEFAULT_STYLE = (
-    "中国风厚涂数字插画，电影感光影，暖赭石与青灰色调，细腻笔触，略带宣纸肌理，"
-    "主体清晰、位于画面中部，画面上方和下方留出较简洁的空间，"
-    "画面中不要出现任何文字、字母、印章或水印"
-)
+# 追加在大模型推荐的画风后面的构图要求：上方留给标题、下方留给字幕，图里不要有字
+STYLE_SUFFIX = "主体清晰、位于画面中部，画面上方和下方留出较简洁的空间，画面中不要出现任何文字、字母、题款、印章或水印"
 # 负面提示词：只有支持它的生图接口（如千问生图）会用到，也可以粘贴到网页工具的「不希望出现」一栏
 DEFAULT_NEGATIVE = "文字，字母，水印，印章，签名，标志，边框，低画质，模糊，畸形的手"
+CAST_DIR = "cast"  # 角色定妆图放在 images/cast/ 里，文件名是角色名
 
 CAPTION_MAX = 15  # 每条字幕最多显示的字数（竖屏一行）
 SCENE_TARGET = 7.5  # 自动分镜：每个画面的目标时长（秒）
@@ -304,6 +307,50 @@ def load_tts(tts_text: str, voice: str, rate: str) -> tuple[bytes, list]:
     return trim_silence(pcm, words)
 
 
+def clip_info(tts_text: str, voice: str, rate: str) -> tuple[int, list]:
+    """一句配音裁掉首尾静音后的采样数和逐词时间。第一次要解码 mp3，结果记进配音缓存的 json，以后直接读。"""
+    _, meta = cache_paths(tts_text, voice, rate)
+    data = json.loads(meta.read_text(encoding="utf-8"))
+    trimmed = data.get("trimmed")
+    if not trimmed or trimmed.get("version") != CLIP_CACHE_VERSION:
+        pcm, words = load_tts(tts_text, voice, rate)
+        trimmed = data["trimmed"] = {"version": CLIP_CACHE_VERSION, "samples": len(pcm) // 2, "words": words}
+        tmp = meta.with_name(f"{meta.name}.{os.getpid()}.{threading.get_ident()}.tmp")
+        tmp.write_text(json.dumps(data, ensure_ascii=False), encoding="utf-8")
+        tmp.replace(meta)
+    return trimmed["samples"], trimmed["words"]
+
+
+def clip_infos(tts_texts: list[str], voice: str, rate: str) -> dict[str, tuple[int, list]]:
+    """批量取 clip_info，还没解码过的几句并行解码。"""
+    uniq = list(dict.fromkeys(tts_texts))
+    with ThreadPoolExecutor(max_workers=8) as pool:
+        return dict(zip(uniq, pool.map(lambda t: clip_info(t, voice, rate), uniq)))
+
+
+def write_narration(path: Path, plan: list, voice: str, rate: str) -> None:
+    """按拼接步骤写出整条配音：数字是一段静音的采样数，文字是一句配音（裁掉首尾静音后）。"""
+    texts = list(dict.fromkeys(step for step in plan if isinstance(step, str)))
+    with ThreadPoolExecutor(max_workers=8) as pool:
+        audio = dict(zip(texts, pool.map(lambda t: load_tts(t, voice, rate)[0], texts)))
+    with wave.open(str(path), "wb") as w:
+        w.setnchannels(1)
+        w.setsampwidth(2)
+        w.setframerate(SAMPLE_RATE)
+        for step in plan:
+            w.writeframes(b"\x00\x00" * step if isinstance(step, int) else audio[step])
+
+
+def narration_current(path: Path, stamp: Path, key: str) -> bool:
+    """narration.wav 是不是按同样的台词和停顿拼出来的，而且之后没被改动过。"""
+    try:
+        data = json.loads(stamp.read_text(encoding="utf-8"))
+        st = path.stat()
+    except (OSError, ValueError):
+        return False
+    return data.get("key") == key and data.get("size") == st.st_size and data.get("mtime") == st.st_mtime_ns
+
+
 def measure_loudness(path: Path) -> dict | None:
     probe = subprocess.run(
         ["ffmpeg", "-hide_banner", "-nostats", "-i", str(path), "-af",
@@ -479,8 +526,7 @@ def script_pieces(md_path: Path) -> list[tuple[dict, list[str]]]:
 
 
 def line_duration(text: str, voice: str, rate: str) -> float:
-    pcm, _ = load_tts(text, voice, rate)
-    return len(pcm) / 2 / SAMPLE_RATE
+    return clip_info(text, voice, rate)[0] / SAMPLE_RATE
 
 
 def chapter_scene(n: int, unit: dict, texts: list[str]) -> dict:
@@ -488,7 +534,8 @@ def chapter_scene(n: int, unit: dict, texts: list[str]) -> dict:
 
 
 def new_storyboard(md_path: Path, voice: str, rate: str, aspect: str, scenes: list[dict],
-                   pronunciation: dict[str, str] | None = None) -> dict:
+                   pronunciation: dict[str, str] | None = None, cast: dict[str, str] | None = None,
+                   style: str | None = None) -> dict:
     title, subtitle = titles_from_filename(md_path)
     return {
         "title": title,
@@ -500,8 +547,9 @@ def new_storyboard(md_path: Path, voice: str, rate: str, aspect: str, scenes: li
         "pauses": dict(DEFAULT_PAUSES),
         "pronunciation": pronunciation or {},
         "bgm": None,
-        "imageStyle": DEFAULT_STYLE,
+        "imageStyle": style or "",
         "negativePrompt": DEFAULT_NEGATIVE,
+        "cast": cast or {},
         "scenes": scenes,
     }
 
@@ -556,7 +604,9 @@ def allocate_images(total: int, sections: list[list[float]]) -> list[int]:
 
 def make_draft(episode: str, md_path: Path, voice: str, rate: str, aspect: str, image_count: int | None = None) -> dict:
     pieces = script_pieces(md_path)
-    synth_all([t for _, ts in pieces for t in ts], voice, rate)
+    texts = [t for _, ts in pieces for t in ts]
+    synth_all(texts, voice, rate)
+    clip_infos(texts, voice, rate)
 
     # 按章节切段：每段是 (章节单元和它要读的句子，开场为 None；[(句子, 时长)])
     sections: list[tuple[tuple[dict, list[str]] | None, list[tuple[str, float]]]] = [(None, [])]
@@ -630,6 +680,27 @@ def validate(sb: dict) -> None:
             die(f"{sc['id']} 复用的分镜 {sc['reuse']} 不存在")
     if sb.get("aspect", "9:16") not in SIZES:
         die(f"aspect 只支持 {', '.join(SIZES)}")
+    cast = sb.get("cast") or {}
+    if not isinstance(cast, dict) or not all(isinstance(k, str) and k.strip() and isinstance(v, str)
+                                             for k, v in cast.items()):
+        die('cast（角色表）的格式应该是 {"角色名": "外貌设定", ...}')
+    stems: dict[str, str] = {}
+    for name in cast:
+        other = stems.setdefault(cast_filename(name), name)
+        if other != name:
+            die(f"角色名「{name}」和「{other}」去掉空格、符号后相同，定妆图会重名，请改掉一个")
+    earlier: set[str] = set()
+    for sc in scenes:
+        names = sc.get("cast", [])
+        if not isinstance(names, list) or not all(isinstance(n, str) for n in names):
+            die(f'{sc["id"]} 的 cast 必须是角色名数组，例如 ["东汉少年皇帝"]')
+        unknown = [n for n in names if n not in cast]
+        if unknown:
+            die(f"{sc['id']} 的 cast 里有角色表没有的角色：{'、'.join(unknown)}（角色表是 storyboard.json 开头的 cast）")
+        if sc.get("follow") and sc["follow"] not in earlier:
+            die(f"{sc['id']} 的 follow 要写它前面某个画面的编号（不能是章节卡），现在是 {sc['follow']!r}")
+        if sc.get("type") != "chapter":
+            earlier.add(sc["id"])
 
 
 def check_drift(md_path: Path, sb: dict) -> None:
@@ -647,12 +718,50 @@ def check_drift(md_path: Path, sb: dict) -> None:
     print("  当前以 storyboard.json 为准；想按文案重新生成分镜请加 --redraft（会覆盖分组和提示词）")
 
 
-def find_image(ep_dir: Path, episode: str, scene_id: str) -> str | None:
+def image_file(folder: Path, stem: str) -> Path | None:
     for ext in IMAGE_EXTS:
-        for name in (scene_id + ext, scene_id + ext.upper()):
-            if (ep_dir / "images" / name).exists():
-                return f"episodes/{episode}/images/{name}"
+        for name in (stem + ext, stem + ext.upper()):
+            if (folder / name).exists():
+                return folder / name
     return None
+
+
+def find_image(ep_dir: Path, episode: str, scene_id: str) -> str | None:
+    f = image_file(ep_dir / "images", scene_id)
+    return f"episodes/{episode}/images/{f.name}" if f else None
+
+
+def cast_filename(name: str) -> str:
+    """角色定妆图的文件名（不含扩展名）：去掉文件名里不能用的符号和空白。"""
+    return re.sub(r'[\\/:*?"<>|\s]+', "_", name).strip("._") or "角色"
+
+
+def find_cast_image(folder: Path, name: str) -> Path | None:
+    return image_file(folder, cast_filename(name))
+
+
+def follow_source(by_id: dict[str, dict], sc: dict) -> str | None:
+    """follow 指向的画面实际用的是哪张图：指向复用别的图的分镜时，就是被复用的那张。"""
+    target = by_id.get(sc.get("follow") or "")
+    return (target.get("reuse") or target["id"]) if target else None
+
+
+def cast_sheet_prompt(name: str, look: str, style: str) -> str:
+    figure = (f"人物定妆图：{name}，{look.strip().rstrip('，。,. ')}。单人全身像，正面站立，神态平静，"
+              "完整展示发型、服饰和配饰，纯浅灰色背景，没有其他人物和场景")
+    return "，".join(p for p in (figure, style.strip().rstrip("，。,. ")) if p)
+
+
+def scene_prompt(text: str, looks: list[tuple[str, str]], style: str, aspect: str) -> str:
+    """出图提示词：画面描述 + 需要用文字说明外貌的角色 + 统一画风 + 构图比例。"""
+    def clean(s: str) -> str:
+        return s.strip().rstrip("，。,. ")
+
+    tail = [p for p in (clean(style), ASPECT_HINT.get(aspect, "")) if p]
+    if not looks:
+        return "，".join(p for p in [clean(text), *tail] if p)
+    described = "；".join(f"{name}：{look.strip().rstrip('，。,.；; ')}" for name, look in looks)
+    return f"{clean(text)}。{described}。" + "，".join(tail)
 
 
 def count_images(ep_dir: Path) -> int:
@@ -665,8 +774,50 @@ def warn_stale_images(episode: str, n: int) -> None:
           f"请在预览里逐个检查，对不上的图删掉后重画（npm run images -- {episode} --only 分镜编号）")
 
 
+def header_size(path: Path) -> tuple[int, int] | None:
+    """从文件头读图片宽高，支持 PNG、JPEG、WebP；读不出来返回 None。"""
+    with open(path, "rb") as f:
+        head = f.read(30)
+        if head.startswith(b"\x89PNG\r\n\x1a\n") and head[12:16] == b"IHDR":
+            return int.from_bytes(head[16:20], "big"), int.from_bytes(head[20:24], "big")
+        if head[:4] == b"RIFF" and head[8:12] == b"WEBP" and len(head) == 30:
+            kind = head[12:16]
+            if kind == b"VP8X":
+                return int.from_bytes(head[24:27], "little") + 1, int.from_bytes(head[27:30], "little") + 1
+            if kind == b"VP8 ":
+                return int.from_bytes(head[26:28], "little") & 0x3FFF, int.from_bytes(head[28:30], "little") & 0x3FFF
+            if kind == b"VP8L":
+                bits = int.from_bytes(head[21:25], "little")
+                return (bits & 0x3FFF) + 1, ((bits >> 14) & 0x3FFF) + 1
+            return None
+        if not head.startswith(b"\xff\xd8"):
+            return None
+        f.seek(2)
+        while True:  # 逐个跳过 JPEG 的段，直到 SOF 段（里面记着宽高）
+            marker = f.read(2)
+            if len(marker) < 2 or marker[0] != 0xFF:
+                return None
+            code = marker[1]
+            if code in (0xD9, 0xDA):  # 到了图像结尾或压缩数据，还没见到 SOF
+                return None
+            if code == 0xFF or code == 0x01 or 0xD0 <= code <= 0xD8:  # 填充字节和没有长度的标记
+                if code == 0xFF:
+                    f.seek(-1, 1)
+                continue
+            length = int.from_bytes(f.read(2), "big")
+            if 0xC0 <= code <= 0xCF and code not in (0xC4, 0xC8, 0xCC):
+                sof = f.read(5)
+                return (int.from_bytes(sof[3:5], "big"), int.from_bytes(sof[1:3], "big")) if len(sof) == 5 else None
+            if length < 2:
+                return None
+            f.seek(length - 2, 1)
+
+
 def probe_size(path: Path) -> tuple[int, int] | None:
     try:
+        size = header_size(path)
+        if size and min(size) > 0:
+            return size
         out = subprocess.run(
             ["ffprobe", "-v", "error", "-select_streams", "v:0", "-show_entries", "stream=width,height",
              "-of", "csv=p=0", str(path)],
@@ -702,7 +853,8 @@ def build(episode: str, args: argparse.Namespace, verbose: bool = True, fill_mis
             print("旧分镜已备份为 storyboard.bak.json")
         draft = make_draft(episode, md_path, args.voice, args.rate, args.aspect, getattr(args, "images", None))
         write_json(sb_path, draft)
-        print(f"已根据 {md_path.name} 生成分镜草稿：{rel(sb_path)}（visual / prompt 待填写，可用 npm run storyboard 让 AI 来写）")
+        print(f"已根据 {md_path.name} 生成分镜草稿：{rel(sb_path)}"
+              "（画风 imageStyle 和每个分镜的 visual、prompt 待填写，可用 npm run storyboard 让 AI 来写）")
 
     sb = load_storyboard(sb_path)
     validate(sb)
@@ -716,21 +868,26 @@ def build(episode: str, args: argparse.Namespace, verbose: bool = True, fill_mis
     aspect = sb.get("aspect", "9:16")
     width, height = SIZES[aspect]
     fps = int(sb.get("fps", 30))
-    style = sb.get("imageStyle", DEFAULT_STYLE)
+    style = sb.get("imageStyle") or ""
 
     narr: dict[str, tuple[str, list[int]]] = {}
     for sc in sb["scenes"]:
         for t in sc.get("lines", []):
             narr[t] = apply_pronunciation(t, pron)
     synth_all([v[0] for v in narr.values()], voice, rate)
+    clips = clip_infos([v[0] for v in narr.values()], voice, rate)
 
-    pcm = bytearray()
+    # 先只排时间线：plan 记下配音怎么拼（数字是静音的采样数，文字是一句配音），真正拼接留到配音有改动时
+    plan: list = []
+    samples = 0
 
     def now() -> float:
-        return len(pcm) / 2 / SAMPLE_RATE
+        return samples / SAMPLE_RATE
 
     def silence(sec: float) -> None:
-        pcm.extend(b"\x00\x00" * int(round(sec * SAMPLE_RATE)))
+        nonlocal samples
+        plan.append(int(round(sec * SAMPLE_RATE)))
+        samples += plan[-1]
 
     scenes_out: list[dict] = []
     captions: list[dict] = []
@@ -746,9 +903,10 @@ def build(episode: str, args: argparse.Namespace, verbose: bool = True, fill_mis
             if li > 0:
                 silence(pauses["line"])
             tts_text, mapping = narr[text]
-            audio, words = load_tts(tts_text, voice, rate)
+            length, words = clips[tts_text]
             t0 = now()
-            pcm.extend(audio)
+            plan.append(tts_text)
+            samples += length
             t1 = now()
             lines_out.append({"scene": sc["id"], "text": text, "start": round(t0, 3), "end": round(t1, 3)})
             if not is_chapter:
@@ -803,15 +961,20 @@ def build(episode: str, args: argparse.Namespace, verbose: bool = True, fill_mis
 
     ep_dir.mkdir(parents=True, exist_ok=True)
     narration = ep_dir / "narration.wav"
-    with wave.open(str(narration), "wb") as w:
-        w.setnchannels(1)
-        w.setsampwidth(2)
-        w.setframerate(SAMPLE_RATE)
-        w.writeframes(bytes(pcm))
-    loudness = normalize_loudness(narration)
-    if loudness is not None:
-        # 成片由 Remotion 输出为双声道（两个声道都是这条配音），实测响度比单声道高约 3 LU
-        print(f"配音响度：{loudness[0]:.1f} LUFS → {loudness[1]:.1f} LUFS（成片为双声道，约 {loudness[1] + 3:.0f} LUFS）")
+    audio_key = hashlib.sha1(json.dumps([SAMPLE_RATE, TARGET_LUFS, TRUE_PEAK, voice, rate, plan],
+                                        ensure_ascii=False).encode("utf-8")).hexdigest()
+    stamp = NARRATION_CACHE / f"{episode}.json"
+    if narration_current(narration, stamp, audio_key):
+        print("配音没有改动，沿用上次的 narration.wav")
+    else:
+        write_narration(narration, plan, voice, rate)
+        loudness = normalize_loudness(narration)
+        if loudness is not None:
+            # 成片由 Remotion 输出为双声道（两个声道都是这条配音），实测响度比单声道高约 3 LU
+            print(f"配音响度：{loudness[0]:.1f} LUFS → {loudness[1]:.1f} LUFS（成片为双声道，约 {loudness[1] + 3:.0f} LUFS）")
+            NARRATION_CACHE.mkdir(parents=True, exist_ok=True)
+            st = narration.stat()
+            write_json(stamp, {"key": audio_key, "size": st.st_size, "mtime": st.st_mtime_ns})
 
     timeline = {
         "version": 1, "episode": episode,
@@ -842,8 +1005,9 @@ def build(episode: str, args: argparse.Namespace, verbose: bool = True, fill_mis
                 warnings.append(f"{sc['id']} 图片比例 {size[0]}x{size[1]} 与视频 {aspect} 差别较大，会被明显裁切")
             elif min(size) < 0.6 * min(width, height):
                 warnings.append(f"{sc['id']} 图片分辨率 {size[0]}x{size[1]} 偏低，画面可能发糊")
-    hint = ASPECT_HINT.get(aspect, "")
     negative = sb.get("negativePrompt", DEFAULT_NEGATIVE)
+    cast = sb.get("cast") or {}
+    cast_dir = ep_dir / "images" / CAST_DIR
     md = [
         f"# {sb.get('title', '')} · 出图提示词",
         "",
@@ -851,13 +1015,27 @@ def build(episode: str, args: argparse.Namespace, verbose: bool = True, fill_mis
         "",
         f"- 进度：需要 {len(need)} 张图，已有 {len(have)} 张，还差 {len(need) - len(have)} 张",
         f"- 画面比例：{aspect}（建议 {width}×{height} 或更高分辨率）",
-        f"- 统一画风（已拼在每条提示词末尾）：{style}",
+        f"- 统一画风（已拼在每条提示词末尾）：{style}" if style.strip() else
+        f"- 统一画风：还没有（imageStyle 是空的），运行 `npm run storyboard -- {episode} --style` 让大模型按内容推荐，或者自己填写",
         f"- 负面提示词（工具有「不希望出现」一栏时填写）：{negative}",
         f"- 自动出图：配置好 .env 后运行 `npm run images -- {episode}`，图片会自动命名并放进 images 文件夹",
         f"- 手动出图：按分镜编号命名（如 S01.png），放进 `public/episodes/{episode}/images/`，再重新运行 `npm run voice -- {episode}`",
         "- 建议先出 3–5 张试画风，满意后再批量出；图里不要有文字，字幕和标题由视频程序叠加",
         "",
     ]
+    if cast:
+        md += [
+            "## 角色表",
+            "",
+            (f"自动出图时，会先给每个角色画一张定妆图，放在 `public/episodes/{episode}/images/{CAST_DIR}/`；"
+             "之后有这个角色的画面，都会把定妆图作为参考图，让人物前后长得一样。"
+             "手动出图时，如果工具支持上传参考图（垫图），把对应的定妆图一起传上去。"),
+            "",
+        ]
+        for name, look in cast.items():
+            sheet = find_cast_image(cast_dir, name)
+            md += [f"### {name} · {f'定妆图 {CAST_DIR}/{sheet.name}' if sheet else '还没有定妆图'}", "",
+                   "```text", cast_sheet_prompt(name, look, style), "```", ""]
     for sc in image_scenes:
         dur = durations.get(sc["id"], 0)
         lines_text = "".join(sc.get("lines", []))
@@ -865,13 +1043,18 @@ def build(episode: str, args: argparse.Namespace, verbose: bool = True, fill_mis
             md += [f"## {sc['id']} · {dur:.1f} 秒 · 复用 {sc['reuse']} 的图片（无需出图）", ""]
             continue
         status = "已有图片" if find_image(ep_dir, episode, sc["id"]) else "待出图"
+        names = [n for n in dict.fromkeys(sc.get("cast", [])) if n in cast]
+        refs = [f"角色：{'、'.join(names)}"] if names else []
+        if sc.get("follow"):
+            refs.append(f"延续 {sc['follow']} 的场景（出图时把它也作为参考图）")
         md += [
             f"## {sc['id']} · {dur:.1f} 秒 · {sc.get('visual') or '（画面待定）'} · {status}",
             "",
             f"> 台词：{lines_text}",
             "",
+            *([" ｜ ".join(refs), ""] if refs else []),
             "```text",
-            "，".join(x for x in (sc.get("prompt", "").rstrip("，。 "), style, hint) if x),
+            scene_prompt(sc.get("prompt", ""), [(n, cast[n]) for n in names], style, aspect),
             "```",
             "",
         ]
@@ -905,6 +1088,9 @@ def build(episode: str, args: argparse.Namespace, verbose: bool = True, fill_mis
     no_prompt = [sc["id"] for sc in need if not (sc.get("prompt") or "").strip()]
     if no_prompt:
         print(f"注意：{len(no_prompt)} 个分镜还没写提示词（{', '.join(no_prompt[:6])}{' 等' if len(no_prompt) > 6 else ''}）")
+    if not style.strip() and len(have) < len(need):
+        print(f"注意：还没有画风（imageStyle 是空的），出图前运行 npm run storyboard -- {episode} --style 让大模型按内容推荐，"
+              "或者自己填写")
     if filled:
         print(f"注意：{len(filled)} 个分镜没有图片，暂时用相邻画面的图片代替：{', '.join(filled)}")
     print()
