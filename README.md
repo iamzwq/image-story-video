@@ -6,7 +6,24 @@
 
 **成片示例**：
 
+<table>
+  <tr>
+    <th>《卖火柴的小女孩》</th>
+    <th>《负荆请罪》</th>
+  </tr>
+  <tr>
+    <td>
+
+https://github.com/user-attachments/assets/e3a967f2-e85a-49ee-ac62-78cd4f97962f
+
+</td>
+    <td>
+
 https://github.com/user-attachments/assets/d404283a-81d3-479d-8600-b31caffdb32c
+
+</td>
+  </tr>
+</table>
 
 ## 适合做什么视频
 

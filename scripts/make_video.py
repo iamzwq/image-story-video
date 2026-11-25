@@ -66,8 +66,10 @@ def check_prompts(episode: str, missing: list[dict]) -> None:
 
 
 def check_style(episode: str, missing: list[dict]) -> None:
+    if not missing:
+        return
     sb = be.load_storyboard(be.EPISODES_DIR / episode / "storyboard.json")
-    if missing and not (sb.get("imageStyle") or "").strip():
+    if not (sb.get("imageStyle") or "").strip():
         be.die(
             f"分镜里还没有画风（imageStyle 是空的），没法出图。\n"
             f"  运行 npm run storyboard -- {episode} --style 让大模型按内容推荐一个，或者自己填写，再重新运行。"
