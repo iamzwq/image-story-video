@@ -8,6 +8,7 @@
     npm run make -- 002 --provider ark     指定生图平台
     npm run make -- 002 --max-cost 30      出图费用上限（默认 20 元）
     npm run make -- 002 --images 20        新写分镜时整集只用 20 张图
+    npm run make -- 002 --no-refs          出图不带参考图，角色外貌只用文字描述
 
 已经完成的步骤会跳过（已有分镜、已有图片），中途中断后重新运行即可接着做。
 """
@@ -40,7 +41,7 @@ def image_args(args: argparse.Namespace) -> argparse.Namespace:
     return argparse.Namespace(
         episode=args.episode, provider=args.provider, only=None, pilot=0, force=False, compare=False,
         yes=True, dry_run=False, auto_fix=True, max_cost=args.max_cost, workers=args.workers,
-        keep_png=False, rebuild=False, no_refs=False,
+        keep_png=False, rebuild=False, no_refs=args.no_refs,
     )
 
 
@@ -93,6 +94,8 @@ def main() -> None:
     parser.add_argument("--max-cost", type=float, default=20.0, help="出图费用上限（元），预计超过时在花钱前停止，默认 20")
     parser.add_argument("--output", help="成片保存位置，默认 out/<集数>.mp4")
     parser.add_argument("--workers", type=int, default=2, help="出图时同时请求的数量（默认 2）")
+    parser.add_argument("--no-refs", action="store_true",
+                        help="出图时不带参考图（角色定妆图、上一格画面），角色外貌只用文字描述")
     parser.add_argument("--voice", default="zh-CN-YunyangNeural", help="新写分镜时使用的配音音色")
     parser.add_argument("--rate", default="+5%", help="新写分镜时使用的语速，如 +5%% 或 -10%%")
     parser.add_argument("--aspect", default="9:16", choices=sorted(be.SIZES), help="新写分镜时使用的画面比例")
@@ -180,8 +183,9 @@ def main() -> None:
         print(f"提示词被大模型改写后才通过审核的分镜：{', '.join(images_result['fixed'])}")
     if info["filled"]:
         ids = ",".join(info["filled"])
+        no_refs = " --no-refs" if args.no_refs else ""
         print(f"注意：{', '.join(info['filled'])} 没能生成图片，成片里暂时用了相邻画面。"
-              f"修改这些分镜的 prompt 后，运行 npm run images -- {episode} --only {ids}，再运行 npm run render -- ep{episode}")
+              f"修改这些分镜的 prompt 后，运行 npm run images -- {episode} --only {ids}{no_refs}，再运行 npm run render -- ep{episode}")
     if stale_images:
         be.warn_stale_images(episode, stale_images)
 

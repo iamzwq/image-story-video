@@ -12,6 +12,8 @@ from envfile import env
 
 MODERATION_HINTS = ("sensitive", "datainspection", "ipinfringement", "risk", "audit")
 ACCOUNT_HINTS = ("overdue", "arrearage", "notopen", "unpurchased", "unactivated", "freetieronly", "invalidsubscription")
+# 模型名写错或已下线（方舟 InvalidEndpointOrModel.NotFound、百炼 Model not exist、OpenAI 兼容接口 model_not_found）
+MODEL_HINTS = ("invalidendpointormodel", "modelnotfound", "model_not_found", "model not exist", "model.notfound")
 # 额度用完、达到用量上限：虽然返回 429，但要等额度恢复，马上重试没用（方舟 QuotaExceeded.*、SetLimitExceeded 等）
 QUOTA_CODES = ("quotaexceeded", "accountquotaexceeded", "setlimitexceeded", "insufficient_quota")
 LLM_VARS = ("LLM_BASE_URL", "LLM_API_KEY", "LLM_MODEL")
@@ -49,6 +51,8 @@ def classify_error(status: int, body: str) -> ApiError:
         return ApiError(f"API Key 无效或没有权限（HTTP {status}）：{detail}", fatal=True)
     if any(h in low for h in ACCOUNT_HINTS):
         return ApiError(f"账号或模型不可用（余额不足、套餐过期、模型未开通等）：{detail}", fatal=True)
+    if any(h in low for h in MODEL_HINTS):
+        return ApiError(f"找不到这个模型（模型名写错或已下线，请检查模型名）：{detail}", fatal=True)
     if moderation:
         return ApiError(f"内容审核未通过：{detail}", moderation=True)
     return ApiError(f"请求被拒绝（HTTP {status}）：{detail}")

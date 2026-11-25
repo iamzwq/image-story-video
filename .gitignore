@@ -1,5 +1,7 @@
 node_modules/
-out/
+out/*
+!out/002.mp4
+!out/002-cover.jpg
 .cache/
 build/
 __pycache__/

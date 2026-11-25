@@ -4,6 +4,12 @@
 
 **流程**：文案 .md → 分镜（storyboard）→ 配音、字幕、时间线（voice）→ 出图（images）→ 导出 MP4（render）和封面（cover）。`npm run make` 一条命令全部完成，也可以分步执行。
 
+<p align="center">
+  <a href="out/002.mp4"><img src="out/002-cover.jpg" alt="002 成片封面" width="240"></a>
+  <br>
+  <sub>成片示例（点击封面播放）</sub>
+</p>
+
 ## 适合做什么视频
 
 画面是 AI 插画（每 5–10 秒一张，镜头缓慢推拉），图里没有文字，一集只有一个配音音色。所以适合闭上眼睛也能听懂的讲解和故事：
@@ -75,6 +81,7 @@ npm run make -- 002
 | `--max-cost <元>` | 出图费用上限 | `20` |
 | `--output <路径>` | 成片保存位置，封面存在同一个文件夹（`<文件名>-cover.jpg`） | `out/<集数>.mp4` |
 | `--workers <数量>` | 出图时同时发出的请求数 | `2` |
+| `--no-refs` | 出图不带参考图，同 images | 带参考图 |
 | `--script`、`--voice`、`--rate`、`--aspect`、`--images` | 同 storyboard，只在新写分镜时生效 | — |
 
 已经有分镜时 make 直接沿用。分镜如果是草稿（没有提示词）或者没有画风，make 一开始就会停下，并提示怎么补。
