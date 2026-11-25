@@ -5,9 +5,11 @@
 **流程**：文案 .md → 分镜（storyboard）→ 配音、字幕、时间线（voice）→ 出图（images）→ 导出 MP4（render）和封面（cover）。`npm run make` 一条命令全部完成，也可以分步执行。
 
 <p align="center">
-  <a href="out/002.mp4"><img src="out/002-cover.jpg" alt="002 成片封面" width="240"></a>
+  <video src="out/002.mp4" poster="out/002-cover.jpg" width="240" controls preload="none">
+    <a href="out/002.mp4"><img src="out/002-cover.jpg" alt="002 成片封面" width="240"></a>
+  </video>
   <br>
-  <sub>成片示例（点击封面播放）</sub>
+  <sub>成片示例</sub>
 </p>
 
 ## 适合做什么视频
