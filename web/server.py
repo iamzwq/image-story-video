@@ -432,6 +432,7 @@ def detail(ep: str) -> dict:
                       if script and script.is_file() else None)
     sb, _ = load_storyboard(ep)
     data["storyboard"] = sb
+    data["options"] = saved_options(ep)
     scene_images: dict[str, dict] = {}
     cast_images: dict[str, str] = {}
     if sb:
@@ -509,7 +510,7 @@ def validate_storyboard(sb) -> None:
     for key in ("title", "subtitle", "imageStyle", "negativePrompt", "voice", "rate"):
         if key in sb and not isinstance(sb[key], str):
             raise HttpError(400, f"{key} 必须是文字")
-    if not VOICE_RE.fullmatch(sb.get("voice", "zh-CN-YunyangNeural")):
+    if not VOICE_RE.fullmatch(sb.get("voice", "zh-CN-YunxiNeural")):
         raise HttpError(400, "音色的格式不对")
     if not RATE_RE.fullmatch(sb.get("rate", "+0%")):
         raise HttpError(400, "语速的格式不对，例如 +5%")
@@ -782,9 +783,9 @@ def py(script: str, *args: str) -> tuple[str, list[str]]:
     return f"uv run scripts/{script} {' '.join(args)}".rstrip(), [UV or "uv", "run", f"scripts/{script}", *args]
 
 
-def storyboard_options(opts: dict) -> list[str]:
-    """新写分镜时用的音色、语速、画面比例和图片张数。"""
-    voice = str(opts.get("voice") or "zh-CN-YunyangNeural")
+def clean_options(opts: dict) -> dict:
+    """新写分镜时用的音色、语速、画面比例和图片张数：检查格式，没填的用默认值。"""
+    voice = str(opts.get("voice") or "zh-CN-YunxiNeural")
     rate = str(opts.get("rate") or "+5%")
     aspect = str(opts.get("aspect") or "9:16")
     if not VOICE_RE.fullmatch(voice):
@@ -793,10 +794,36 @@ def storyboard_options(opts: dict) -> list[str]:
         raise HttpError(400, "语速的格式不对，例如 +5%")
     if aspect not in be.SIZES:
         raise HttpError(400, "画面比例不对")
-    args = ["--voice", voice, f"--rate={rate}", "--aspect", aspect]  # --rate=-10% 要连写，否则会被当成参数名
-    if opts.get("images"):
-        args += ["--images", str(int_option(opts["images"], 1, 500, "图片张数"))]
+    images = int_option(opts["images"], 1, 500, "图片张数") if opts.get("images") else None
+    return {"voice": voice, "rate": rate, "aspect": aspect, "images": images}
+
+
+def storyboard_options(opts: dict) -> list[str]:
+    o = clean_options(opts)
+    args = ["--voice", o["voice"], f"--rate={o['rate']}", "--aspect", o["aspect"]]  # --rate=-10% 要连写，否则会被当成参数名
+    if o["images"]:
+        args += ["--images", str(o["images"])]
     return args
+
+
+# 网页上最近一次选的新写分镜选项，下次打开这一集时还显示这些
+OPTIONS_FILE = "options.json"
+
+
+def save_options(ep: str, opts: dict) -> None:
+    path = episode_dir(ep) / OPTIONS_FILE
+    path.parent.mkdir(parents=True, exist_ok=True)
+    be.write_json(path, clean_options(opts))
+
+
+def saved_options(ep: str) -> dict | None:
+    data = gi.read_json(episode_dir(ep) / OPTIONS_FILE)
+    if not isinstance(data, dict) or not data:
+        return None
+    try:
+        return clean_options(data)
+    except HttpError:  # 手改坏了就当没有
+        return None
 
 
 def start_job(ep: str, body: dict) -> dict:
@@ -891,7 +918,10 @@ def start_job(ep: str, body: dict) -> dict:
             steps, title = [py("make_video.py", ep, *args)], "一键生成视频"
     else:
         raise HttpError(400, f"不认识的任务：{kind}")
-    return jobs.public(jobs.submit(ep, kind, title, steps))
+    job = jobs.public(jobs.submit(ep, kind, title, steps))
+    if kind in ("storyboard", "draft") or (kind == "make" and not sb):
+        save_options(ep, opts)
+    return job
 
 
 # ---------------------------------------------------------------- 接口
@@ -950,9 +980,16 @@ CREATE_LOCK = threading.Lock()
 
 @route("POST", r"/api/episodes")
 def api_create_episode(req: Request) -> dict:
+    opts = req.body.get("options")
+    if opts is not None and not isinstance(opts, dict):
+        raise HttpError(400, "选项的格式不对")
+    if opts:
+        clean_options(opts)  # 先检查，格式不对就不新建
     with CREATE_LOCK:
         ep = next_episode_id()
         write_script(ep, req.body, None)
+        if opts:
+            save_options(ep, opts)
     return summary(ep)
 
 

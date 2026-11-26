@@ -53,7 +53,7 @@ export const NewEpisodePage: React.FC<{ ready: Ready | null; onCreated: () => vo
     setError("");
     let episode: EpisodeSummary;
     try {
-      episode = await request<EpisodeSummary>("/api/episodes", "POST", { title, subtitle, text });
+      episode = await request<EpisodeSummary>("/api/episodes", "POST", { title, subtitle, text, options });
     } catch (e) {
       setError(errorText(e));
       setBusy(false);

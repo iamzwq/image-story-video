@@ -81,6 +81,8 @@ export type EpisodeDetail = EpisodeSummary & {
   timeline: Timeline | null;
   timelineVersion: string | null;
   durations: Record<string, number>;
+  /** 网页上最近一次选的新写分镜选项；没有就是 null */
+  options: StoryboardOptions | null;
 };
 
 export type Ready = { llm: boolean; image: string | null; imageError: string; ffmpeg: boolean };

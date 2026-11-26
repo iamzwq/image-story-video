@@ -783,7 +783,7 @@ def run(args: argparse.Namespace) -> dict:
             print("  如果报错和参考图有关，可以加 --no-refs，改成只用文字描述人物")
     if done and getattr(args, "rebuild", True):
         print("正在更新时间线…")
-        be.build(args.episode, argparse.Namespace(script=None, redraft=False, voice=sb.get("voice", "zh-CN-YunyangNeural"),
+        be.build(args.episode, argparse.Namespace(script=None, redraft=False, voice=sb.get("voice", "zh-CN-YunxiNeural"),
                                                   rate=sb.get("rate", "+0%"), aspect=sb.get("aspect", "9:16")), verbose=False)
         print("下一步：npm run dev 预览（刷新浏览器即可看到新图片）")
     return result

@@ -2,8 +2,8 @@ import type { Motion, Stage, StoryboardOptions } from "./api";
 import type { Tone } from "./components/ui";
 
 export const VOICES = [
+  { id: "zh-CN-YunxiNeural", name: "云希", note: "男声，年轻有活力，适合讲故事（默认）" },
   { id: "zh-CN-YunyangNeural", name: "云扬", note: "男声，新闻播报，适合历史、科普" },
-  { id: "zh-CN-YunxiNeural", name: "云希", note: "男声，年轻有活力，适合讲故事" },
   { id: "zh-CN-YunjianNeural", name: "云健", note: "男声，浑厚有力，适合纪录片" },
   { id: "zh-CN-XiaoxiaoNeural", name: "晓晓", note: "女声，温暖亲切，适合故事、情感" },
   { id: "zh-CN-XiaoyiNeural", name: "晓伊", note: "女声，活泼，适合童话" },
@@ -39,7 +39,7 @@ export const STAGES: Record<Stage, { label: string; tone: Tone }> = {
   done: { label: "已完成", tone: "ok" },
 };
 
-export const DEFAULT_OPTIONS: StoryboardOptions = { voice: "zh-CN-YunyangNeural", rate: "+5%", aspect: "9:16", images: null };
+export const DEFAULT_OPTIONS: StoryboardOptions = { voice: "zh-CN-YunxiNeural", rate: "+5%", aspect: "9:16", images: null };
 
 export const PROVIDERS = {
   ark: {

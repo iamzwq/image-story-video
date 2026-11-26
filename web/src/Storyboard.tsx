@@ -78,7 +78,7 @@ export const StoryboardSettings: React.FC<{
           </div>
           <div className="flex flex-col gap-1.5">
             <VoicePicker
-              voice={sb.voice ?? "zh-CN-YunyangNeural"}
+              voice={sb.voice ?? "zh-CN-YunxiNeural"}
               rate={sb.rate ?? "+0%"}
               disabled={locked}
               onChange={(voice, rate) => onUpdate((s) => ({ ...s, voice, rate }))}

@@ -56,7 +56,7 @@ npm run make -- 002
 | `--script <路径>` | 手动指定文案 | `texts/` 里以集数编号开头的 .md |
 | `--force` | 已有分镜时重写。旧文件备份为 storyboard.bak.json；分镜编号会重排，旧图片可能对不上 | 已有分镜时拒绝覆盖 |
 | `--style` | 只按内容重新推荐画风，改 `imageStyle`（旧文件同样备份） | — |
-| `--voice <音色>` | 配音音色 | `zh-CN-YunyangNeural` |
+| `--voice <音色>` | 配音音色 | `zh-CN-YunxiNeural`（云希） |
 | `--rate <语速>` | 如 `+10%`；放慢时写成 `--rate=-10%` | `+5%` |
 | `--aspect <比例>` | `9:16`、`16:9`、`1:1`、`3:4` | `9:16` |
 | `--images <张数>` | 整集只用这么多张图，每张对应一段较长的台词。开场和每章至少 1 张，7 分钟的视频建议不少于 15 张 | 每 5–10 秒一张 |
@@ -133,7 +133,7 @@ npm run lint                                         # 改过 src/ 之后检查�
 | --- | --- |
 | 改台词 | 分镜的 `lines` |
 | 纠正读音 | `pronunciation`，如 `"单于": "蝉于"`、`"221年": "二百二十一年"`，字幕仍显示原文 |
-| 换音色、语速 | `voice`、`rate`。常用音色：云扬 `zh-CN-YunyangNeural`（新闻腔）、云希 `zh-CN-YunxiNeural`、云健 `zh-CN-YunjianNeural`、晓晓 `zh-CN-XiaoxiaoNeural` |
+| 换音色、语速 | `voice`、`rate`。常用音色：云希 `zh-CN-YunxiNeural`（默认）、云扬 `zh-CN-YunyangNeural`（新闻腔）、云健 `zh-CN-YunjianNeural`、晓晓 `zh-CN-XiaoxiaoNeural` |
 | 句间停顿 | `pauses`（秒）：`line` 是同一画面的两句之间，`scene` 是换图时 |
 | 某张图停太久或太短 | 把 `lines` 拆到新分镜（起个新编号如 `S12b`，配同名图片），或合并到相邻分镜 |
 | 重复使用前面的图 | `"reuse": "S07"` |

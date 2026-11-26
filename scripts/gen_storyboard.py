@@ -631,7 +631,7 @@ def main() -> None:
     parser.add_argument("episode", help="集数编号，例如 002")
     parser.add_argument("--script", help="文案 .md 路径（默认自动找 texts/ 里以集数编号开头的 .md）")
     parser.add_argument("--force", action="store_true", help="已有 storyboard.json 时重新生成（旧文件会备份）")
-    parser.add_argument("--voice", default="zh-CN-YunyangNeural", help="配音音色")
+    parser.add_argument("--voice", default="zh-CN-YunxiNeural", help="配音音色")
     parser.add_argument("--rate", default="+5%", help="语速，如 +5%% 或 -10%%")
     parser.add_argument("--aspect", default="9:16", choices=sorted(be.SIZES), help="画面比例")
     parser.add_argument("--images", type=int, help="整集只用这么多张图（每张图对应一段较长的台词），不加就每 5–10 秒一张")

@@ -98,7 +98,7 @@ def main() -> None:
     parser.add_argument("--workers", type=int, default=2, help="出图时同时请求的数量（默认 2）")
     parser.add_argument("--no-refs", action="store_true",
                         help="出图时不带参考图（角色定妆图、上一格画面），角色外貌只用文字描述")
-    parser.add_argument("--voice", default="zh-CN-YunyangNeural", help="新写分镜时使用的配音音色")
+    parser.add_argument("--voice", default="zh-CN-YunxiNeural", help="新写分镜时使用的配音音色")
     parser.add_argument("--rate", default="+5%", help="新写分镜时使用的语速，如 +5%% 或 -10%%")
     parser.add_argument("--aspect", default="9:16", choices=sorted(be.SIZES), help="新写分镜时使用的画面比例")
     parser.add_argument("--images", type=int, help="新写分镜时，整集只用这么多张图（不加就每 5–10 秒一张）")

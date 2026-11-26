@@ -113,7 +113,8 @@ export const EpisodePage: React.FC<{ id: string; ready: Ready | null; onChanged:
     return flash ? { tone: "warn", text: flash } : null;
   });
   const [dialog, setDialog] = useState<DialogState | null>(null);
-  const [options, setOptions] = useState<StoryboardOptions>(DEFAULT_OPTIONS);
+  // 没在这一页改过选项时，用这一集记下的选项（新建视频时选的，或者上次写分镜用的）
+  const [editedOptions, setOptions] = useState<StoryboardOptions | null>(null);
 
   const markDirty = (value: boolean) => {
     dirtyRef.current = value;
@@ -166,6 +167,7 @@ export const EpisodePage: React.FC<{ id: string; ready: Ready | null; onChanged:
   const { need, have } = detail.imageCount;
   const missing = need - have;
   const step = STEP_INDEX[detail.stage];
+  const options = editedOptions ?? detail.options ?? DEFAULT_OPTIONS;
 
   const startJob = async (kind: string, opts: Record<string, unknown> = {}) => {
     setNotice(null);
@@ -183,7 +185,7 @@ export const EpisodePage: React.FC<{ id: string; ready: Ready | null; onChanged:
     voice: saved?.voice ?? options.voice,
     rate: saved?.rate ?? options.rate,
     aspect: saved?.aspect ?? options.aspect,
-    images: null,
+    images: options.images,
   };
 
   const openImages = (req: ImagesRequest) => setDialog({ kind: "images", request: req });

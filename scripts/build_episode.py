@@ -870,7 +870,7 @@ def build(episode: str, args: argparse.Namespace, verbose: bool = True, fill_mis
     if md_path and md_path.exists():
         check_drift(md_path, sb)
 
-    voice = sb.get("voice", "zh-CN-YunyangNeural")
+    voice = sb.get("voice", "zh-CN-YunxiNeural")
     rate = sb.get("rate", "+0%")
     pauses = {**DEFAULT_PAUSES, **(sb.get("pauses") or {})}
     pron = sb.get("pronunciation") or {}
@@ -1130,7 +1130,7 @@ def main() -> None:
     parser.add_argument("episode", help="集数编号，例如 001")
     parser.add_argument("--script", help="文案 .md 路径（默认自动找 texts/ 里以集数编号开头的 .md）")
     parser.add_argument("--redraft", action="store_true", help="按文案重新生成分镜草稿（覆盖 storyboard.json，旧文件备份）")
-    parser.add_argument("--voice", default="zh-CN-YunyangNeural", help="生成新草稿时使用的音色")
+    parser.add_argument("--voice", default="zh-CN-YunxiNeural", help="生成新草稿时使用的音色")
     parser.add_argument("--rate", default="+5%", help="生成新草稿时使用的语速，如 +5%% 或 -10%%")
     parser.add_argument("--aspect", default="9:16", choices=sorted(SIZES), help="生成新草稿时使用的画面比例")
     parser.add_argument("--images", type=int, help="生成新草稿时，整集只用这么多张图（不加就每 5–10 秒一张）")
