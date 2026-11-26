@@ -5,10 +5,12 @@ import os
 from pathlib import Path
 
 
-def load_env(root: Path) -> None:
+def read_env(root: Path) -> dict[str, str]:
+    """读出 .env 里填了值的项，不改动环境变量。同一项写了多次时以第一个有值的为准。"""
     path = root / ".env"
+    values: dict[str, str] = {}
     if not path.exists():
-        return
+        return values
     for raw in path.read_text(encoding="utf-8-sig").splitlines():
         line = raw.strip()
         if not line or line.startswith("#"):
@@ -23,7 +25,14 @@ def load_env(root: Path) -> None:
             value = value[1:-1]
         else:
             value = value.split(" #", 1)[0].strip()
-        if value and not os.environ.get(key):
+        if value:
+            values.setdefault(key, value)
+    return values
+
+
+def load_env(root: Path) -> None:
+    for key, value in read_env(root).items():
+        if not os.environ.get(key):
             os.environ[key] = value
 
 

@@ -1134,10 +1134,12 @@ def main() -> None:
     parser.add_argument("--rate", default="+5%", help="生成新草稿时使用的语速，如 +5%% 或 -10%%")
     parser.add_argument("--aspect", default="9:16", choices=sorted(SIZES), help="生成新草稿时使用的画面比例")
     parser.add_argument("--images", type=int, help="生成新草稿时，整集只用这么多张图（不加就每 5–10 秒一张）")
+    parser.add_argument("--fill-missing", action="store_true",
+                        help="没有图片的分镜暂用相邻画面的图片（导出前用，和 npm run make 导出时一样）")
     args = parser.parse_args()
     if not re.fullmatch(r"[A-Za-z0-9-]+", args.episode):
         die("集数编号只能包含字母、数字和 -（例如 001）")
-    build(args.episode, args)
+    build(args.episode, args, fill_missing=args.fill_missing)
 
 
 if __name__ == "__main__":

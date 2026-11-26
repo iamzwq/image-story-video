@@ -2,7 +2,9 @@ node_modules/
 out/
 .cache/
 build/
+web/dist/
 __pycache__/
 .env
+.env.tmp
 public/episodes/*/storyboard.bak.json
 public/episodes/*/compare/

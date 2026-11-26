@@ -159,17 +159,18 @@ class Provider:
         raise ApiError("返回结果里没有图片数据")
 
 
-def configured_providers() -> dict[str, Provider]:
+def configured_providers(get: Callable[..., str] = env) -> dict[str, Provider]:
+    """已经填了 Key 的生图平台。get(变量名, 默认值) 读取配置，默认读环境变量（网页版传入它读到的设置）。"""
     found: dict[str, Provider] = {}
-    if env("DASHSCOPE_API_KEY"):
+    if get("DASHSCOPE_API_KEY"):
         found["bailian"] = Provider(
-            "bailian", env("DASHSCOPE_IMAGE_MODEL", "z-image-turbo"), env("DASHSCOPE_API_KEY"),
-            env("DASHSCOPE_BASE_URL", "https://dashscope.aliyuncs.com").rstrip("/"),
+            "bailian", get("DASHSCOPE_IMAGE_MODEL", "z-image-turbo"), get("DASHSCOPE_API_KEY"),
+            get("DASHSCOPE_BASE_URL", "https://dashscope.aliyuncs.com").rstrip("/"),
         )
-    if env("ARK_API_KEY"):
+    if get("ARK_API_KEY"):
         found["ark"] = Provider(
-            "ark", env("ARK_IMAGE_MODEL", "doubao-seedream-5-5-261028"), env("ARK_API_KEY"),
-            env("ARK_BASE_URL", "https://ark.cn-beijing.volces.com/api/v3").rstrip("/"),
+            "ark", get("ARK_IMAGE_MODEL", "doubao-seedream-5-5-261028"), get("ARK_API_KEY"),
+            get("ARK_BASE_URL", "https://ark.cn-beijing.volces.com/api/v3").rstrip("/"),
         )
     return found
 
@@ -435,6 +436,16 @@ def planned_refs(sc: dict, cast: dict[str, str], limit: int, by_id: dict, dest: 
     return plan_refs(sc, cast, limit, lambda _: True, ok)
 
 
+def plan_cost(model: str, todo: list[dict], sheets: list[str], cast: dict[str, str], limit: int, by_id: dict,
+              dest: Path) -> tuple[float, list[int]]:
+    """预估这一批图的费用（元，单价未知的按 0 算），以及每张分镜带几张参考图。"""
+    in_run = {sc["id"] for sc in todo}
+    counts = [len(names) + bool(follow) for names, follow in
+              (planned_refs(sc, cast, limit, by_id, dest, in_run) for sc in todo)]
+    total = (estimate(model) or 0) * (len(todo) + len(sheets)) + sum(ref_cost(model, k) for k in counts)
+    return total, counts
+
+
 def read_json(path: Path) -> dict:
     try:
         return json.loads(path.read_text(encoding="utf-8")) if path.exists() else {}
@@ -695,10 +706,7 @@ def run(args: argparse.Namespace) -> dict:
             continue
         yuan = estimate(p.model)
         n = len(todo)
-        in_run = {sc["id"] for sc in todo}
-        counts = [len(names) + bool(follow) for names, follow in
-                  (planned_refs(sc, cast, limit, by_id, dest, in_run) for sc in todo)]
-        total = (yuan or 0) * (n + len(sheets)) + sum(ref_cost(p.model, k) for k in counts)
+        total, counts = plan_cost(p.model, todo, sheets, cast, limit, by_id, dest)
         cost += total
         note = f"，约 {total:.2f} 元" if yuan else "，单价未知"
         ids = ", ".join(sc["id"] for sc in todo[:12]) + (" 等" if n > 12 else "")

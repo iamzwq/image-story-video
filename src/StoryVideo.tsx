@@ -1,6 +1,7 @@
 import { Audio } from "@remotion/media";
 import React from "react";
-import { AbsoluteFill, interpolate, Sequence, staticFile, useCurrentFrame, useVideoConfig } from "remotion";
+import { AbsoluteFill, interpolate, Sequence, useCurrentFrame, useVideoConfig } from "remotion";
+import { assetUrl } from "./assets";
 import { Bgm } from "./components/Bgm";
 import { Captions } from "./components/Captions";
 import { ChapterCard } from "./components/ChapterCard";
@@ -54,7 +55,7 @@ export const StoryVideo: React.FC<StoryProps> = ({ episode, timeline }) => {
           <Cover episode={episode} timeline={timeline} />
         </Sequence>
       ) : null}
-      <Audio src={staticFile(timeline.audio)} name="配音" />
+      <Audio src={assetUrl(timeline.audio)} name="配音" />
       {timeline.bgm ? <Bgm src={timeline.bgm.src} volume={timeline.bgm.volume} /> : null}
     </AbsoluteFill>
   );

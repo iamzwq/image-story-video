@@ -119,14 +119,17 @@ def missing_llm_vars() -> list[str]:
     return [name for name in LLM_VARS if not env(name)]
 
 
+def chat_endpoint(base_url: str) -> str:
+    """LLM_BASE_URL 可以只写到 /v1 这一级，这里补全成对话接口的地址。"""
+    url = base_url.strip().rstrip("/")
+    return url if url.endswith("/chat/completions") else url + "/chat/completions"
+
+
 def llm_settings() -> tuple[str, str, str] | None:
     """读取 .env 里的大模型配置；没配置齐时返回 None。"""
     if missing_llm_vars():
         return None
-    url = env("LLM_BASE_URL").rstrip("/")
-    if not url.endswith("/chat/completions"):
-        url += "/chat/completions"
-    return url, env("LLM_API_KEY"), env("LLM_MODEL")
+    return chat_endpoint(env("LLM_BASE_URL")), env("LLM_API_KEY"), env("LLM_MODEL")
 
 
 def chat(settings: tuple[str, str, str], messages: list[dict], timeout: int = 600) -> str:

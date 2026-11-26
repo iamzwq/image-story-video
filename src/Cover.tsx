@@ -1,5 +1,6 @@
 import React from "react";
-import { AbsoluteFill, Img, staticFile, useVideoConfig } from "remotion";
+import { AbsoluteFill, Img, useVideoConfig } from "remotion";
+import { assetUrl } from "./assets";
 import { MOTIONS } from "./components/ImageScene";
 import { SANS, SERIF } from "./fonts";
 import type { ImageScene, StoryProps } from "./types";
@@ -37,7 +38,7 @@ export const Cover: React.FC<StoryProps> = ({ timeline }) => {
         <AbsoluteFill
           style={{ transform: `scale(${motion.scale[0]}) translate(${motion.x[0]}%, ${motion.y[0]}%)` }}
         >
-          <Img src={staticFile(first.image)} style={{ width: "100%", height: "100%", objectFit: "cover" }} />
+          <Img src={assetUrl(first.image)} style={{ width: "100%", height: "100%", objectFit: "cover" }} />
         </AbsoluteFill>
       ) : null}
       {/* 标题栏放在画面中部偏下：在 3:4 等裁切预览里也能完整显示 */}

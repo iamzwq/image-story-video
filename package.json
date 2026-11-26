@@ -5,6 +5,8 @@
   "private": true,
   "license": "UNLICENSED",
   "scripts": {
+    "web": "node web/launch.mjs",
+    "web:dev": "vite --config web/vite.config.mts",
     "dev": "remotion studio",
     "make": "uv run scripts/make_video.py",
     "storyboard": "uv run scripts/gen_storyboard.py",
@@ -15,16 +17,26 @@
     "lint": "tsc"
   },
   "dependencies": {
+    "@base-ui/react": "1.9.0",
     "@remotion/cli": "4.0.545",
     "@remotion/fonts": "4.0.545",
     "@remotion/media": "4.0.545",
+    "@remotion/player": "4.0.545",
+    "clsx": "2.1.1",
+    "lucide-react": "1.80.0",
     "react": "19.3.1",
     "react-dom": "19.3.1",
-    "remotion": "4.0.545"
+    "remotion": "4.0.545",
+    "tailwind-merge": "3.7.1"
   },
   "devDependencies": {
+    "@tailwindcss/vite": "4.3.5",
     "@types/react": "19.3.0",
-    "typescript": "5.9.3"
+    "@types/react-dom": "19.3.0",
+    "@vitejs/plugin-react": "6.3.0",
+    "tailwindcss": "4.3.5",
+    "typescript": "5.9.3",
+    "vite": "8.3.8"
   },
   "engines": {
     "node": "^20.19.0 || ^22.13.0 || >=24"

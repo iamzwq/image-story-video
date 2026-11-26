@@ -1,5 +1,6 @@
 import React from "react";
-import { AbsoluteFill, Img, interpolate, staticFile, useCurrentFrame, useVideoConfig } from "remotion";
+import { AbsoluteFill, Img, interpolate, useCurrentFrame, useVideoConfig } from "remotion";
+import { assetUrl } from "../assets";
 import { SANS, SERIF } from "../fonts";
 import type { ImageScene as ImageSceneData, Motion } from "../types";
 
@@ -77,7 +78,7 @@ export const ImageScene: React.FC<{ scene: ImageSceneData; index: number; durati
       <AbsoluteFill style={{ transform: `scale(${at(motion.scale)}) translate(${at(motion.x)}%, ${at(motion.y)}%)` }}>
         {scene.image ? (
           <Img
-            src={staticFile(scene.image)}
+            src={assetUrl(scene.image)}
             style={{ width: "100%", height: "100%", objectFit: "cover" }}
           />
         ) : (
