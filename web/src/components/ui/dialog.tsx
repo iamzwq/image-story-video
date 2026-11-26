@@ -22,12 +22,12 @@ export const Dialog: React.FC<{
   >
     <BaseDialog.Portal>
       <BaseDialog.Backdrop className={backdrop} />
-      <BaseDialog.Popup className="fixed top-1/2 left-1/2 z-50 flex max-h-[calc(100vh-48px)] w-[min(560px,calc(100vw-32px))] -translate-x-1/2 -translate-y-1/2 flex-col overflow-hidden rounded-base border-2 border-ink bg-white shadow-brutal-lg outline-none transition-[scale,opacity] duration-150 data-ending-style:scale-95 data-ending-style:opacity-0 data-starting-style:scale-95 data-starting-style:opacity-0">
+      <BaseDialog.Popup className="fixed top-1/2 left-1/2 z-50 flex max-h-[calc(100dvh-48px)] w-[min(560px,calc(100vw-32px))] -translate-x-1/2 -translate-y-1/2 flex-col overflow-hidden rounded-base border-2 border-ink bg-white shadow-brutal-lg outline-hidden transition-[scale,opacity] duration-150 data-ending-style:scale-95 data-ending-style:opacity-0 data-starting-style:scale-95 data-starting-style:opacity-0">
         <div className="flex items-center gap-3 border-b-2 border-ink bg-main px-5 py-3">
           <BaseDialog.Title className="flex-1 text-lg font-black">{title}</BaseDialog.Title>
           <BaseDialog.Close
             aria-label="关闭"
-            className="grid size-7 cursor-pointer place-items-center rounded-[4px] border-2 border-ink bg-white hover:bg-ink hover:text-white"
+            className="grid size-7 cursor-pointer place-items-center rounded-sm border-2 border-ink bg-white hover:bg-ink hover:text-white pointer-coarse:size-11"
           >
             <X className="size-4" strokeWidth={2.5} />
           </BaseDialog.Close>
@@ -40,7 +40,7 @@ export const Dialog: React.FC<{
 );
 
 /** 看大图：点任意位置或按 Esc 关闭 */
-export const Lightbox: React.FC<{ url: string; onClose: () => void }> = ({ url, onClose }) => (
+export const Lightbox: React.FC<{ url: string; alt?: string; onClose: () => void }> = ({ url, alt = "", onClose }) => (
   <BaseDialog.Root
     open
     onOpenChange={(open) => {
@@ -53,13 +53,13 @@ export const Lightbox: React.FC<{ url: string; onClose: () => void }> = ({ url, 
       <BaseDialog.Backdrop className={`${backdrop} bg-ink/70`} />
       <BaseDialog.Popup
         aria-label="查看大图"
-        className="fixed inset-0 z-50 grid cursor-zoom-out place-items-center p-6 outline-none"
+        className="fixed inset-0 z-50 grid cursor-zoom-out place-items-center p-6 outline-hidden"
         onClick={onClose}
       >
         <img
           src={url}
-          alt=""
-          className="max-h-[calc(100vh-48px)] max-w-full rounded-base border-2 border-ink bg-white shadow-brutal-lg"
+          alt={alt}
+          className="max-h-[calc(100dvh-48px)] max-w-full rounded-base border-2 border-ink bg-white shadow-brutal-lg"
         />
       </BaseDialog.Popup>
     </BaseDialog.Portal>

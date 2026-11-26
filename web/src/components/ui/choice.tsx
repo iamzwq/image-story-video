@@ -17,7 +17,7 @@ export const Checkbox: React.FC<{
       checked={checked}
       disabled={disabled}
       onCheckedChange={(c) => onChange(c)}
-      className="mt-0.5 grid size-5 flex-none cursor-pointer place-items-center rounded-[4px] border-2 border-ink bg-white shadow-brutal-sm outline-none focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-ink data-checked:bg-main"
+      className="mt-0.5 grid size-5 flex-none cursor-pointer place-items-center rounded-sm border-2 border-ink bg-white shadow-brutal-sm outline-hidden focus-visible:outline-2 focus-visible:outline-solid focus-visible:outline-offset-2 focus-visible:outline-ink data-checked:bg-main"
     >
       <BaseCheckbox.Indicator>
         <Check className="size-3.5" strokeWidth={3.5} />
@@ -46,7 +46,7 @@ export const Radio: React.FC<{ value: string; className?: string; children: Reac
   <label className={cn("flex cursor-pointer items-center gap-2", className)}>
     <BaseRadio.Root
       value={value}
-      className="grid size-5 flex-none cursor-pointer place-items-center rounded-full border-2 border-ink bg-white outline-none focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-ink data-checked:bg-main"
+      className="grid size-5 flex-none cursor-pointer place-items-center rounded-full border-2 border-ink bg-white outline-hidden focus-visible:outline-2 focus-visible:outline-solid focus-visible:outline-offset-2 focus-visible:outline-ink data-checked:bg-main"
     >
       <BaseRadio.Indicator className="size-2 rounded-full bg-ink" />
     </BaseRadio.Root>

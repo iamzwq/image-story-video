@@ -188,7 +188,7 @@ export const JobPanel: React.FC<{ job: Job; onFinished: () => void }> = ({ job, 
       {info.status === "running" ? (
         <div className="flex flex-col gap-1.5">
           {stage ? (
-            <div className="text-[13px] font-extrabold">
+            <div className="text-label font-extrabold">
               {stage}
               {progress ? `（${progress[0]}/${progress[1]}）` : ""}
             </div>
@@ -211,7 +211,7 @@ export const JobPanel: React.FC<{ job: Job; onFinished: () => void }> = ({ job, 
         <Disclosure title={`运行日志（${lines.length} 行）`} size="sm" open={logOpen} onOpenChange={setLogOpen}>
           <pre
             ref={logRef}
-            className="max-h-[300px] overflow-y-auto rounded-base border-2 border-ink bg-ink p-2.5 text-xs text-[#e8f5d0]"
+            className="max-h-86 overflow-y-auto rounded-base border-2 border-ink bg-ink p-2.5 text-xs text-terminal"
             onScroll={(e) => {
               const el = e.currentTarget;
               stick.current = el.scrollHeight - el.scrollTop - el.clientHeight < 24;

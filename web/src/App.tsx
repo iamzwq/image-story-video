@@ -1,4 +1,4 @@
-import { Check, Play, Plus, Settings } from "lucide-react";
+import { Check, Menu, Play, Plus, Settings, X } from "lucide-react";
 import React, { useCallback, useEffect, useState } from "react";
 import type { EpisodeList, Ready } from "./api";
 import { formatDuration, request } from "./api";
@@ -12,18 +12,20 @@ import { SettingsLink, StageBadge } from "./ui";
 
 const navItem = (active: boolean) =>
   cn(
-    "flex items-center gap-2.5 rounded-base border-2 border-ink px-2 py-1.5 font-normal text-ink no-underline transition-[background-color,box-shadow,translate] duration-100",
+    "flex items-center gap-2.5 rounded-base border-2 border-ink px-2 py-1.5 font-normal text-ink no-underline transition-[background-color,box-shadow,translate] duration-100 motion-reduce:transition-none",
     active
       ? "bg-main shadow-brutal hover:bg-main"
       : "bg-paper hover:-translate-x-px hover:-translate-y-px hover:bg-main-soft hover:shadow-brutal-sm",
   );
 
-const navId = "min-w-[34px] flex-none rounded-[4px] border-2 border-ink bg-white px-1 text-center font-mono text-[11px] font-bold";
+const navId = "min-w-10 flex-none rounded-sm border-2 border-ink bg-white px-1 text-center font-mono text-caption font-bold";
 
 export const App: React.FC = () => {
   const route = useRoute();
   const [list, setList] = useState<EpisodeList | null>(null);
   const [offline, setOffline] = useState(false);
+  // 窄屏时侧栏收成顶栏，点菜单按钮才展开视频列表
+  const [menuOpen, setMenuOpen] = useState(false);
 
   const refresh = useCallback(() => {
     request<EpisodeList>("/api/episodes")
@@ -40,50 +42,79 @@ export const App: React.FC = () => {
   const setupMissing = ready !== null && (!ready.llm || !ready.image);
 
   return (
-    <div className="grid min-h-screen md:grid-cols-[248px_minmax(0,1fr)]">
-      <aside className="flex flex-col gap-4 border-ink bg-white px-3 py-5 max-md:border-b-2 md:sticky md:top-0 md:h-screen md:border-r-2">
-        <a className="flex items-center gap-2.5 px-1.5 text-base font-black text-ink no-underline hover:bg-transparent" href="#/">
-          <span className="grid size-8 -rotate-6 place-items-center rounded-base border-2 border-ink bg-ink text-main shadow-brutal-sm">
-            <Play className="size-4 fill-current" />
-          </span>
-          图文口播视频
-        </a>
-        <Button variant="primary" block onClick={() => navigate("/new")}>
-          <Plus strokeWidth={3} />
-          新建视频
-        </Button>
-        <nav className="-mx-1 flex flex-1 flex-col gap-2.5 overflow-y-auto px-1 pt-1 pr-2 pb-2">
-          {list?.episodes.length ? (
-            <div className="px-2 pb-1 text-xs font-extrabold tracking-wider text-muted">我的视频</div>
-          ) : null}
-          {list?.episodes.map((ep) => (
-            <a key={ep.id} href={`#/ep/${ep.id}`} className={navItem(route.page === "episode" && route.id === ep.id)}>
-              <span className={navId}>{ep.id}</span>
-              <span className="flex min-w-0 flex-col items-start gap-1">
-                <span className="max-w-full truncate font-semibold">{ep.title}</span>
-                <StageBadge episode={ep} />
-              </span>
-            </a>
-          ))}
-        </nav>
-        <div className="border-t-2 border-ink pt-3">
-          <a href="#/settings" className={cn(navItem(route.page === "settings"), "group")}>
-            <span className="flex w-[34px] flex-none justify-center">
-              <span className="grid size-7 place-items-center rounded-base border-2 border-ink bg-white shadow-brutal-sm">
-                <Settings
-                  className="size-4 transition-transform duration-300 group-hover:rotate-90"
-                  strokeWidth={2.5}
-                />
-              </span>
+    <div className="grid min-h-dvh md:grid-cols-[var(--spacing-sidebar)_minmax(0,1fr)]">
+      {/* 网址用 # 做路由，不能用 href="#main"，所以点了之后直接把焦点移到正文 */}
+      <Button
+        variant="dark"
+        className="fixed top-3 left-3 z-50 -translate-y-24 focus-visible:translate-y-0"
+        onClick={() => document.getElementById("main")?.focus()}
+      >
+        跳到正文
+      </Button>
+      <aside className="flex flex-col gap-4 border-ink bg-white px-3 py-5 max-md:border-b-2 max-md:py-3 md:sticky md:top-0 md:h-dvh md:border-r-2">
+        <div className="flex items-center justify-between gap-3">
+          <a className="flex items-center gap-2.5 px-1.5 text-base font-black text-ink no-underline hover:bg-transparent" href="#/">
+            <span className="grid size-8 -rotate-6 place-items-center rounded-base border-2 border-ink bg-ink text-main shadow-brutal-sm">
+              <Play className="size-4 fill-current" />
             </span>
-            <span className="font-semibold">设置</span>
-            {setupMissing ? (
-              <span className="ml-auto size-3 rounded-full border-2 border-ink bg-warn" title="还有设置没填" />
-            ) : null}
+            图文口播视频
           </a>
+          <Button
+            className="md:hidden"
+            aria-expanded={menuOpen}
+            aria-controls="site-menu"
+            onClick={() => setMenuOpen(!menuOpen)}
+          >
+            {menuOpen ? <X strokeWidth={3} /> : <Menu strokeWidth={3} />}
+            {menuOpen ? "收起" : "菜单"}
+          </Button>
+        </div>
+        <div
+          id="site-menu"
+          className={cn("flex min-h-0 flex-1 flex-col gap-4", !menuOpen && "max-md:hidden")}
+          onClick={(e) => {
+            if ((e.target as HTMLElement).closest("a, button")) {
+              setMenuOpen(false);
+            }
+          }}
+        >
+          <Button variant="primary" block onClick={() => navigate("/new")}>
+            <Plus strokeWidth={3} />
+            新建视频
+          </Button>
+          <nav className="-mx-1 flex flex-1 flex-col gap-2.5 overflow-y-auto px-1 pt-1 pr-2 pb-2">
+            {list?.episodes.length ? (
+              <div className="px-2 pb-1 text-xs font-extrabold tracking-wider text-muted">我的视频</div>
+            ) : null}
+            {list?.episodes.map((ep) => (
+              <a key={ep.id} href={`#/ep/${ep.id}`} className={navItem(route.page === "episode" && route.id === ep.id)}>
+                <span className={navId}>{ep.id}</span>
+                <span className="flex min-w-0 flex-col items-start gap-1">
+                  <span className="max-w-full truncate font-semibold">{ep.title}</span>
+                  <StageBadge episode={ep} />
+                </span>
+              </a>
+            ))}
+          </nav>
+          <div className="border-t-2 border-ink pt-3">
+            <a href="#/settings" className={cn(navItem(route.page === "settings"), "group")}>
+              <span className="flex w-10 flex-none justify-center">
+                <span className="grid size-7 place-items-center rounded-base border-2 border-ink bg-white shadow-brutal-sm">
+                  <Settings
+                    className="size-4 transition-transform duration-300 motion-safe:group-hover:rotate-90"
+                    strokeWidth={2.5}
+                  />
+                </span>
+              </span>
+              <span className="font-semibold">设置</span>
+              {setupMissing ? (
+                <span className="ml-auto size-3 rounded-full border-2 border-ink bg-warn" title="还有设置没填" />
+              ) : null}
+            </a>
+          </div>
         </div>
       </aside>
-      <main className="flex min-w-0 flex-col gap-4 px-4 pt-5 pb-28 md:px-8 md:pt-7">
+      <main id="main" tabIndex={-1} className="flex min-w-0 flex-col gap-4 px-4 pt-5 pb-28 outline-hidden md:px-8 md:pt-7">
         {offline ? <Alert tone="error">连不上网页后台：请确认运行 npm run web 的终端窗口还开着。</Alert> : null}
         {ready?.ffmpeg === false ? (
           <Alert tone="error">
@@ -155,7 +186,7 @@ const Home: React.FC<{ list: EpisodeList | null; ready: Ready | null }> = ({ lis
               >
                 {s.done ? <Check className="size-4" strokeWidth={3.5} /> : i + 1}
               </span>
-              <strong className="mt-1 text-[15px] font-black">{s.title}</strong>
+              <strong className="mt-1 text-reading leading-normal font-black">{s.title}</strong>
               <span className="text-muted">{s.body}</span>
             </li>
           ))}
@@ -177,17 +208,17 @@ const Home: React.FC<{ list: EpisodeList | null; ready: Ready | null }> = ({ lis
             <a
               key={ep.id}
               href={`#/ep/${ep.id}`}
-              className="group overflow-hidden rounded-base border-2 border-ink bg-white font-normal text-ink no-underline shadow-brutal transition-[translate,box-shadow] duration-100 hover:translate-x-[2px] hover:translate-y-[2px] hover:bg-white hover:shadow-brutal-sm"
+              className="group overflow-hidden rounded-base border-2 border-ink bg-white font-normal text-ink no-underline shadow-brutal transition-[translate,box-shadow] duration-100 motion-reduce:transition-none hover:translate-x-[2px] hover:translate-y-[2px] hover:bg-white hover:shadow-brutal-sm"
             >
               {ep.cover ? (
                 <img
                   src={ep.cover.url}
                   alt=""
                   loading="lazy"
-                  className="aspect-9/16 max-h-[260px] w-full border-b-2 border-ink bg-ink object-cover"
+                  className="aspect-9/16 max-h-74 w-full border-b-2 border-ink bg-ink object-cover"
                 />
               ) : (
-                <div className="grid aspect-9/16 max-h-[260px] w-full place-items-center border-b-2 border-ink bg-main font-mono text-4xl font-black">
+                <div className="grid aspect-9/16 max-h-74 w-full place-items-center border-b-2 border-ink bg-main font-mono text-4xl font-black">
                   {ep.id}
                 </div>
               )}

@@ -100,7 +100,7 @@ export const NewEpisodePage: React.FC<{ ready: Ready | null; onCreated: () => vo
             }
           >
             <Textarea
-              className="min-h-[300px] text-[15px] leading-[1.8]"
+              className="min-h-86 text-reading"
               value={text}
               rows={18}
               placeholder={"战国时期，赵国有两位名臣……\n\n## 第一章：完璧归赵\n（用 ## 小标题或「第一章：……」分章节，会显示章节卡）"}

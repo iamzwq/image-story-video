@@ -187,7 +187,7 @@ export const SettingsPage: React.FC<{ onSaved: () => void }> = ({ onSaved }) => 
             <strong className="font-black">{p.label}</strong>
             <span className="text-muted">{p.note}</span>
           </Radio>
-          <span className="flex gap-3 text-[13px]">
+          <span className="flex gap-3 text-label">
             {p.links.map((l) => (
               <a key={l.href} href={l.href} target="_blank" rel="noreferrer" className="inline-flex items-center gap-0.5">
                 {l.label}
@@ -239,11 +239,11 @@ export const SettingsPage: React.FC<{ onSaved: () => void }> = ({ onSaved }) => 
       />
 
       <div className="flex flex-wrap gap-3">
-        <Badge tone={data.ready.llm ? "ok" : "warn"} className="px-3 py-1 text-[13px] [&_svg]:size-3.5">
+        <Badge tone={data.ready.llm ? "ok" : "warn"} className="px-3 py-1 text-label [&_svg]:size-3.5">
           {data.ready.llm ? <Check strokeWidth={3} /> : <X strokeWidth={3} />}
           {data.ready.llm ? "大模型已填写" : "大模型还没填写，没法写分镜"}
         </Badge>
-        <Badge tone={data.ready.image ? "ok" : "warn"} className="px-3 py-1 text-[13px] [&_svg]:size-3.5">
+        <Badge tone={data.ready.image ? "ok" : "warn"} className="px-3 py-1 text-label [&_svg]:size-3.5">
           {data.ready.image ? <Check strokeWidth={3} /> : <X strokeWidth={3} />}
           {data.ready.image ? `出图用 ${data.ready.image}` : data.ready.imageError}
         </Badge>

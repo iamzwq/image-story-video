@@ -58,7 +58,7 @@ type DialogState =
   | { kind: "confirm"; title: string; body: React.ReactNode; action: string; run: () => void }
   | { kind: "make" }
   | { kind: "rewrite" }
-  | { kind: "zoom"; url: string };
+  | { kind: "zoom"; url: string; alt?: string };
 
 const STEPS = ["文案", "分镜", "出图", "导出"];
 const STEP_INDEX = { script: 1, draft: 1, images: 2, ready: 3, done: 4 };
@@ -82,7 +82,7 @@ const StepCard: React.FC<{ tag: string; tone?: Tone; title: string; children: Re
 }) => (
   <Card className="flex flex-col gap-3">
     <div className="flex flex-wrap items-center gap-2.5">
-      <Badge tone={tone} className="px-2.5 py-0.5 text-[13px] [&_svg]:size-3.5">
+      <Badge tone={tone} className="px-2.5 py-0.5 text-label [&_svg]:size-3.5">
         {tone === "ok" ? <Check strokeWidth={3} /> : <ArrowRight strokeWidth={3} />}
         {tag}
       </Badge>
@@ -248,7 +248,7 @@ export const EpisodePage: React.FC<{ id: string; ready: Ready | null; onChanged:
   // 导出过、但之后又改了内容：「下一步」卡片底部留一行，还能找到上次的成片
   const pastExport =
     detail.video && detail.stage !== "done" ? (
-      <div className="flex flex-wrap items-center gap-x-2 gap-y-1 border-t-2 border-dashed border-ink/25 pt-3 text-[13px]">
+      <div className="flex flex-wrap items-center gap-x-2 gap-y-1 border-t-2 border-dashed border-ink/25 pt-3 text-label">
         <span className="font-semibold text-muted">上次导出的成片（{formatTime(detail.video.mtime)}）：</span>
         <RevealButton episode={id} link />
         <DownloadLinks detail={detail} />
@@ -392,7 +392,7 @@ export const EpisodePage: React.FC<{ id: string; ready: Ready | null; onChanged:
                   type="button"
                   className="w-24 flex-none cursor-zoom-in overflow-hidden rounded-base border-2 border-ink shadow-brutal-sm"
                   title="看大图"
-                  onClick={() => setDialog({ kind: "zoom", url: cover.url })}
+                  onClick={() => setDialog({ kind: "zoom", url: cover.url, alt: "??" })}
                 >
                   <img src={cover.url} alt="封面" className="block w-full" />
                 </button>
@@ -401,7 +401,7 @@ export const EpisodePage: React.FC<{ id: string; ready: Ready | null; onChanged:
                 <p>
                   之后修改了分镜或图片，再导出一次就行。
                   {video ? (
-                    <span className="mt-1 block text-[13px] text-muted">
+                    <span className="mt-1 block text-label text-muted">
                       {formatSize(video.size)} · 导出于 {formatTime(video.mtime)}
                     </span>
                   ) : null}
@@ -413,7 +413,7 @@ export const EpisodePage: React.FC<{ id: string; ready: Ready | null; onChanged:
                     重新导出
                   </Button>
                 </Actions>
-                <div className="flex flex-wrap items-center gap-x-2 gap-y-1 text-[13px]">
+                <div className="flex flex-wrap items-center gap-x-2 gap-y-1 text-label">
                   <DownloadLinks detail={detail} />
                 </div>
               </div>
@@ -441,11 +441,11 @@ export const EpisodePage: React.FC<{ id: string; ready: Ready | null; onChanged:
               <li
                 key={name}
                 className={cn(
-                  "flex items-center gap-1.5 rounded-full border-2 border-ink py-1 pr-3 pl-1 text-[13px] font-bold",
+                  "flex items-center gap-1.5 rounded-full border-2 border-ink py-1 pr-3 pl-1 text-label font-bold",
                   i < step ? "bg-ok" : i === step ? "bg-main shadow-brutal-sm" : "bg-white text-muted",
                 )}
               >
-                <span className="grid size-5 place-items-center rounded-full border-2 border-ink bg-white text-[11px] font-black text-ink">
+                <span className="grid size-5 place-items-center rounded-full border-2 border-ink bg-white text-caption font-black text-ink">
                   {i < step ? <Check className="size-3" strokeWidth={4} /> : i + 1}
                 </span>
                 {name}
@@ -476,7 +476,7 @@ export const EpisodePage: React.FC<{ id: string; ready: Ready | null; onChanged:
         <div className="flex min-w-0 flex-col gap-5">
           {nextStep()}
           {saved ? (
-            <div className="-mt-1 flex flex-wrap items-center gap-x-1 gap-y-0.5 text-[13px]">
+            <div className="-mt-1 flex flex-wrap items-center gap-x-1 gap-y-0.5 text-label">
               <span className="mr-1 font-semibold text-muted">更多操作：</span>
               <Button variant="link" disabled={jobsBlocked} onClick={() => setDialog({ kind: "rewrite" })}>
                 <Sparkles />
@@ -521,7 +521,7 @@ export const EpisodePage: React.FC<{ id: string; ready: Ready | null; onChanged:
                 defaultOpen={have === 0}
                 onUpdate={update}
                 onRestyle={restyle}
-                onZoom={(url) => setDialog({ kind: "zoom", url })}
+                onZoom={(url, alt) => setDialog({ kind: "zoom", url, alt })}
               />
               <SceneList
                 detail={detail}
@@ -530,7 +530,7 @@ export const EpisodePage: React.FC<{ id: string; ready: Ready | null; onChanged:
                 jobsBlocked={jobsBlocked}
                 onUpdate={update}
                 onRedraw={(sceneId) => openImages({ mode: "only", ids: sceneId, title: `重画 ${sceneId}` })}
-                onZoom={(url) => setDialog({ kind: "zoom", url })}
+                onZoom={(url, alt) => setDialog({ kind: "zoom", url, alt })}
               />
               <ScriptCard
                 key={detail.script?.text ?? ""}
@@ -548,7 +548,7 @@ export const EpisodePage: React.FC<{ id: string; ready: Ready | null; onChanged:
         </div>
 
         {/* 单栏时任务进度和预览放在最上面，不用滚到底才看得到；右侧留出投影的位置 */}
-        <aside className="flex flex-col gap-5 max-lg:order-first lg:sticky lg:top-4 lg:max-h-[calc(100vh-32px)] lg:overflow-y-auto lg:pr-2 lg:pb-2">
+        <aside className="flex flex-col gap-5 max-lg:order-first lg:sticky lg:top-4 lg:max-h-[calc(100dvh-32px)] lg:overflow-y-auto lg:pr-2 lg:pb-2">
           {detail.job ? (
             <JobPanel
               key={detail.job.id}
@@ -574,7 +574,7 @@ export const EpisodePage: React.FC<{ id: string; ready: Ready | null; onChanged:
       </div>
 
       {dirty ? (
-        <div className="fixed right-0 bottom-0 left-0 z-20 flex flex-wrap items-center gap-3 border-t-2 border-ink bg-main px-4 py-3 md:left-[248px] md:px-8">
+        <div className="fixed right-0 bottom-0 left-0 z-20 flex flex-wrap items-center gap-3 border-t-2 border-ink bg-main px-4 py-3 md:left-sidebar md:px-8">
           <span className="font-semibold">有未保存的修改。保存后会更新配音和时间线（改了台词、读音或音色才会重新配音）。</span>
           <span className="flex-1" />
           <Button disabled={saving} onClick={discard}>
@@ -626,7 +626,7 @@ export const EpisodePage: React.FC<{ id: string; ready: Ready | null; onChanged:
           onStart={(opts) => startJob("storyboard", opts)}
         />
       ) : null}
-      {dialog?.kind === "zoom" ? <Lightbox url={dialog.url} onClose={() => setDialog(null)} /> : null}
+      {dialog?.kind === "zoom" ? <Lightbox url={dialog.url} alt={dialog.alt} onClose={() => setDialog(null)} /> : null}
     </Page>
   );
 };
@@ -676,7 +676,7 @@ const ScriptCard: React.FC<{
       </div>
       <Field label="文案">
         <Textarea
-          className="min-h-[300px] text-[15px] leading-[1.8]"
+          className="min-h-86 text-reading"
           rows={16}
           value={text}
           disabled={locked}
@@ -725,7 +725,7 @@ const ScriptCard: React.FC<{
             form
           ) : (
             <>
-              <pre className="max-h-[360px] overflow-y-auto rounded-base border-2 border-ink bg-paper p-3 font-sans text-sm leading-[1.8]">
+              <pre className="max-h-103 overflow-y-auto rounded-base border-2 border-ink bg-paper p-3 font-sans text-sm leading-[1.8]">
                 {originalText}
               </pre>
               <div>
@@ -881,7 +881,7 @@ const ImagesDialog: React.FC<{
             {estimate.priceKnown ? (
               <p>
                 预计约{" "}
-                <strong className="mx-0.5 inline-block rounded-[4px] bg-main px-1.5 text-2xl font-black">
+                <strong className="mx-0.5 inline-block rounded-sm bg-main px-1.5 text-2xl font-black">
                   {estimate.cost.toFixed(2)}
                 </strong>{" "}
                 元

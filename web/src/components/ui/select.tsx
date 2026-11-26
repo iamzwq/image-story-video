@@ -24,7 +24,7 @@ export const Select: React.FC<{
   >
     <BaseSelect.Trigger
       className={cn(
-        "flex h-[38px] w-full min-w-0 cursor-pointer items-center justify-between gap-2 rounded-base border-2 border-ink bg-white pr-2.5 pl-3 text-left text-sm outline-none select-none",
+        "flex h-11 w-full min-w-0 cursor-pointer items-center justify-between gap-2 rounded-base border-2 border-ink bg-white pr-2.5 pl-3 text-left text-sm outline-hidden select-none pointer-coarse:h-13",
         "focus-visible:shadow-brutal-sm data-popup-open:shadow-brutal-sm",
         "data-disabled:cursor-not-allowed data-disabled:bg-paper data-disabled:text-muted",
         className,
@@ -36,10 +36,10 @@ export const Select: React.FC<{
       </BaseSelect.Icon>
     </BaseSelect.Trigger>
     <BaseSelect.Portal>
-      <BaseSelect.Positioner className="z-50 outline-none select-none" sideOffset={6} alignItemWithTrigger={false}>
+      <BaseSelect.Positioner className="z-50 outline-hidden select-none" sideOffset={6} alignItemWithTrigger={false}>
         <BaseSelect.Popup
           className={cn(
-            "min-w-(--anchor-width) origin-(--transform-origin) rounded-base border-2 border-ink bg-white p-1 shadow-brutal outline-none",
+            "min-w-(--anchor-width) origin-(--transform-origin) rounded-base border-2 border-ink bg-white p-1 shadow-brutal outline-hidden",
             "transition-[scale,opacity] duration-100 data-ending-style:scale-95 data-ending-style:opacity-0 data-starting-style:scale-95 data-starting-style:opacity-0",
           )}
         >
@@ -48,7 +48,7 @@ export const Select: React.FC<{
               <BaseSelect.Item
                 key={item.value}
                 value={item.value}
-                className="grid cursor-pointer grid-cols-[16px_1fr] items-center gap-2 rounded-[4px] py-1.5 pr-3 pl-2 text-sm outline-none data-highlighted:bg-main data-selected:font-bold"
+                className="grid cursor-pointer grid-cols-[16px_1fr] items-center gap-2 rounded-sm py-1.5 pr-3 pl-2 text-sm outline-hidden data-highlighted:bg-main data-selected:font-bold pointer-coarse:py-3"
               >
                 <BaseSelect.ItemIndicator className="col-start-1">
                   <Check className="size-3.5" strokeWidth={3} />

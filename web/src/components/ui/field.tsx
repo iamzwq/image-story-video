@@ -4,8 +4,8 @@ import React from "react";
 import { cn } from "../../lib/cn";
 
 export const controlClass =
-  "w-full min-w-0 rounded-base border-2 border-ink bg-white px-3 py-[7px] text-sm text-ink outline-none transition-shadow " +
-  "placeholder:text-muted/60 focus:shadow-brutal-sm " +
+  "w-full min-w-0 rounded-base border-2 border-ink bg-white px-3 py-2 text-sm text-ink outline-hidden transition-shadow " +
+  "placeholder:text-muted/85 focus:shadow-brutal-sm pointer-coarse:py-3 " +
   "disabled:cursor-not-allowed disabled:bg-paper disabled:text-muted";
 
 /**
@@ -21,7 +21,7 @@ export const Field: React.FC<{
 }> = ({ label, hint, nativeLabel = true, className, children }) => (
   <BaseField.Root className={cn("flex min-w-0 flex-col gap-1.5", className)}>
     <BaseField.Label
-      className="w-fit text-[13px] font-extrabold"
+      className="w-fit text-label font-extrabold"
       {...(nativeLabel ? {} : { nativeLabel: false, render: <div /> })}
     >
       {label}

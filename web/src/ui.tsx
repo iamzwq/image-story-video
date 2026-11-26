@@ -85,7 +85,7 @@ export const VoicePicker: React.FC<{
       <Field label="语速" nativeLabel={false}>
         <Select value={rate} items={rates} disabled={disabled} onChange={(r) => onChange(voice, r)} />
       </Field>
-      <Button onClick={play} disabled={state !== "idle"} className="h-[38px]">
+      <Button onClick={play} disabled={state !== "idle"} className="h-11">
         {state === "idle" ? <Volume2 /> : <Spinner />}
         {state === "loading" ? "生成试听…" : state === "playing" ? "播放中…" : "试听"}
       </Button>
@@ -119,7 +119,7 @@ export const StoryboardOptionsForm: React.FC<{
       />
     </Field>
     <div className="flex flex-col gap-1.5">
-      <span className="text-[13px] font-extrabold">图片张数</span>
+      <span className="text-label font-extrabold">图片张数</span>
       <div className="flex flex-wrap items-center gap-2.5">
         <Segmented
           label="图片张数"

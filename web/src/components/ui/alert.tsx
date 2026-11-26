@@ -38,7 +38,7 @@ export const Alert: React.FC<{
         <button
           type="button"
           aria-label="关闭"
-          className="-mr-1 grid size-6 flex-none cursor-pointer place-items-center rounded-[4px] hover:bg-ink hover:text-white"
+          className="-mr-1 grid size-6 flex-none cursor-pointer place-items-center rounded-sm hover:bg-ink hover:text-white pointer-coarse:size-11"
           onClick={onClose}
         >
           <X className="size-4" strokeWidth={2.5} />

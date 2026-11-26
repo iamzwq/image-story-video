@@ -34,7 +34,7 @@ export const StoryboardSettings: React.FC<{
   defaultOpen: boolean;
   onUpdate: Update;
   onRestyle: () => void;
-  onZoom: (url: string) => void;
+  onZoom: (url: string, alt?: string) => void;
 }> = ({ sb, castImages, locked, defaultOpen, onUpdate, onRestyle, onZoom }) => {
   const [open, setOpen] = useState(defaultOpen);
   const cast = sb.cast ?? NO_ENTRIES;
@@ -106,14 +106,14 @@ export const StoryboardSettings: React.FC<{
   );
 };
 
-const sectionLabel = "text-[13px] font-extrabold";
+const sectionLabel = "text-label font-extrabold";
 
 const CastEditor: React.FC<{
   cast: Record<string, string>;
   images: Record<string, string>;
   locked: boolean;
   onChange: (cast: Record<string, string>) => void;
-  onZoom: (url: string) => void;
+  onZoom: (url: string, alt?: string) => void;
 }> = ({ cast, images, locked, onChange, onZoom }) => {
   const names = Object.keys(cast);
   return (
@@ -130,13 +130,13 @@ const CastEditor: React.FC<{
                 {images[name] ? (
                   <button
                     type="button"
-                    className="aspect-3/4 w-18 flex-none cursor-zoom-in overflow-hidden rounded-[4px] border-2 border-ink bg-white"
-                    onClick={() => onZoom(images[name])}
+                    className="aspect-3/4 w-18 flex-none cursor-zoom-in overflow-hidden rounded-sm border-2 border-ink bg-white"
+                    onClick={() => onZoom(images[name], name)}
                   >
                     <img src={images[name]} alt={name} loading="lazy" className="size-full object-cover" />
                   </button>
                 ) : (
-                  <div className="grid aspect-3/4 w-18 flex-none place-items-center rounded-[4px] border-2 border-dashed border-ink bg-white p-1 text-center text-[11px] text-muted">
+                  <div className="grid aspect-3/4 w-18 flex-none place-items-center rounded-sm border-2 border-dashed border-ink bg-white p-1 text-center text-caption text-muted">
                     还没有定妆图
                   </div>
                 )}
@@ -262,7 +262,7 @@ export const SceneList: React.FC<{
   jobsBlocked: boolean;
   onUpdate: Update;
   onRedraw: (id: string) => void;
-  onZoom: (url: string) => void;
+  onZoom: (url: string, alt?: string) => void;
 }> = ({ detail, sb, locked, jobsBlocked, onUpdate, onRedraw, onZoom }) => {
   const [filter, setFilter] = useState<Filter>("all");
   const [expanded, setExpanded] = useState(false);
@@ -370,7 +370,7 @@ const SceneCard: React.FC<{
   jobsBlocked: boolean;
   onChange: (patch: Partial<Scene>) => void;
   onRedraw: () => void;
-  onZoom: (url: string) => void;
+  onZoom: (url: string, alt?: string) => void;
 }> = ({ scene, image, reuseImage, duration, changed, castNames, aspect, locked, jobsBlocked, onChange, onRedraw, onZoom }) => {
   const [editing, setEditing] = useState(false);
   const shown = image ?? reuseImage;
@@ -384,10 +384,10 @@ const SceneCard: React.FC<{
     >
       <button
         type="button"
-        className="max-h-59 cursor-zoom-in self-start overflow-hidden rounded-[4px] border-2 border-ink bg-[repeating-linear-gradient(135deg,#fdf8ec_0_10px,#f3ead2_10px_20px)] text-xs font-semibold text-muted disabled:cursor-default"
+        className="max-h-59 cursor-zoom-in self-start overflow-hidden rounded-sm border-2 border-ink bg-[repeating-linear-gradient(135deg,var(--color-paper)_0_10px,var(--color-paper-deep)_10px_20px)] text-xs font-semibold text-muted disabled:cursor-default"
         style={{ aspectRatio: aspect }}
         disabled={!shown}
-        onClick={() => shown && onZoom(shown.url)}
+        onClick={() => shown && onZoom(shown.url, scene.visual || scene.id)}
       >
         {shown ? (
           <img src={shown.url} alt={scene.visual || scene.id} loading="lazy" className="size-full object-cover" />
@@ -401,7 +401,7 @@ const SceneCard: React.FC<{
       <div className="flex min-w-0 flex-col gap-2">
         <div className="flex items-start gap-2">
           <div className="flex min-w-0 flex-1 flex-wrap items-center gap-x-2 gap-y-1 pt-1">
-            <span className="rounded-[4px] bg-ink px-1.5 font-mono text-xs leading-5 font-bold text-main">{scene.id}</span>
+            <span className="rounded-sm bg-ink px-1.5 font-mono text-xs leading-5 font-bold text-main">{scene.id}</span>
             <strong className="font-black">{scene.visual || "（没有画面说明）"}</strong>
             {duration !== undefined ? (
               <span className="inline-flex items-center gap-0.5 text-xs text-muted">
@@ -433,13 +433,13 @@ const SceneCard: React.FC<{
           <SceneEditor scene={scene} castNames={castNames} locked={locked} onChange={onChange} />
         ) : (
           <>
-            <p className="text-[15px] leading-[1.75]">
+            <p className="text-reading">
               {scene.lines.join("") || <span className="text-muted">（没有台词，停留 {scene.hold ?? 2} 秒）</span>}
             </p>
             {scene.reuse ? (
               <p className="text-muted">复用 {scene.reuse} 的图片，不用单独出图</p>
             ) : (
-              <p className="text-[13px] text-muted">
+              <p className="text-label text-muted">
                 {scene.prompt || <span className="font-semibold text-warn-ink">还没有出图提示词</span>}
               </p>
             )}

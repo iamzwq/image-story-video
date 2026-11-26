@@ -22,8 +22,20 @@
   --color-info: #8fb8ff;
   --color-info-soft: #e0ebff;
   --color-pink: #ff9ed8;
+  --color-paper-deep: #f3ead2;
+  --color-terminal: #e8f5d0;
 
+  /* 根字号是 14px，默认的 rem 字号会偏小，这几档按像素给 */
+  --text-caption: 11px;
+  --text-label: 13px;
+  --text-reading: 15px;
+  --text-reading--line-height: 1.8;
+
+  --radius-xs: 3px;
+  --radius-sm: 4px;
   --radius-base: 6px;
+
+  --spacing-sidebar: 248px;
 
   --shadow-brutal-sm: 2px 2px 0 0 var(--color-ink);
   --shadow-brutal: 4px 4px 0 0 var(--color-ink);
@@ -66,8 +78,11 @@
     text-underline-offset: 3px;
   }
 
-  a:hover {
-    background-color: var(--color-main);
+  /* 只在能悬停的设备上生效，触屏上点完不会一直高亮 */
+  a {
+    @variant hover {
+      background-color: var(--color-main);
+    }
   }
 
   ::selection {

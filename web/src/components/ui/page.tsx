@@ -13,7 +13,7 @@ export const PageHeader: React.FC<{
 }> = ({ title, subtitle, eyebrow, aside }) => (
   <header className="flex flex-wrap items-end justify-between gap-4">
     <div className="min-w-0">
-      {eyebrow ? <div className="mb-1.5 text-[13px] font-semibold text-muted">{eyebrow}</div> : null}
+      {eyebrow ? <div className="mb-1.5 text-label font-semibold text-muted">{eyebrow}</div> : null}
       <h1 className="text-[28px] md:text-[32px]">{title}</h1>
       {subtitle ? <p className="mt-1.5 text-muted">{subtitle}</p> : null}
     </div>

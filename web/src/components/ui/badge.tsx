@@ -20,7 +20,7 @@ export const Badge: React.FC<{ tone?: Tone; className?: string; children: React.
 }) => (
   <span
     className={cn(
-      "inline-flex max-w-full items-center gap-1 overflow-hidden rounded-full border-2 border-ink px-2 text-xs leading-[18px] font-bold text-ellipsis whitespace-nowrap text-ink [&_svg]:size-3 [&_svg]:shrink-0",
+      "inline-flex max-w-full items-center gap-1 overflow-hidden rounded-full border-2 border-ink px-2 text-xs leading-5 font-bold text-ellipsis whitespace-nowrap text-ink [&_svg]:size-3 [&_svg]:shrink-0",
       tones[tone],
       className,
     )}
@@ -52,5 +52,5 @@ export const Chip: React.FC<{ tone?: keyof typeof chipTones; className?: string;
 );
 
 export const Spinner: React.FC<{ className?: string }> = ({ className }) => (
-  <LoaderCircle className={cn("size-3.5 flex-none animate-spin", className)} aria-label="运行中" />
+  <LoaderCircle className={cn("size-3.5 flex-none animate-spin motion-reduce:animate-none", className)} aria-label="运行中" />
 );

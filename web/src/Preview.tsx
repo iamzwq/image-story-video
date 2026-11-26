@@ -15,10 +15,10 @@ export const Preview: React.FC<{ episode: string; timeline: Timeline; version: s
   const portrait = timeline.height > timeline.width;
   return (
     <div
-      className="mx-auto w-full overflow-hidden rounded-base border-2 border-ink bg-black max-lg:max-w-[320px]!"
+      className="mx-auto w-full overflow-hidden rounded-base border-2 border-ink bg-black max-lg:max-w-92!"
       style={{
         aspectRatio: `${timeline.width} / ${timeline.height}`,
-        maxWidth: portrait ? `calc(66vh * ${timeline.width} / ${timeline.height})` : undefined,
+        maxWidth: portrait ? `calc(66dvh * ${timeline.width} / ${timeline.height})` : undefined,
       }}
     >
       <Player

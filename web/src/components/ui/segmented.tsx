@@ -39,11 +39,11 @@ export const Segmented = <T extends string>({
         value={o.value}
         title={o.title}
         className={cn(
-          "cursor-pointer rounded-base border-2 border-ink bg-white font-semibold whitespace-nowrap outline-none transition-[background-color,box-shadow,translate] duration-100",
-          "hover:not-data-disabled:bg-main-soft focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-ink",
+          "cursor-pointer rounded-base border-2 border-ink bg-white font-semibold whitespace-nowrap outline-hidden transition-[background-color,box-shadow,translate] duration-100",
+          "hover:not-data-disabled:bg-main-soft focus-visible:outline-2 focus-visible:outline-solid focus-visible:outline-offset-2 focus-visible:outline-ink",
           "data-pressed:-translate-x-px data-pressed:-translate-y-px data-pressed:bg-main data-pressed:font-extrabold data-pressed:shadow-brutal-sm data-pressed:hover:bg-main",
           "data-disabled:cursor-not-allowed data-disabled:opacity-55",
-          size === "sm" ? "px-2.5 py-0.5 text-[13px]" : "px-3 py-[5px] text-sm",
+          size === "sm" ? "px-2.5 py-0.5 text-label pointer-coarse:min-h-11" : "px-3 py-1.5 text-sm pointer-coarse:min-h-13",
         )}
       >
         {o.label}

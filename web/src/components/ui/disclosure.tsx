@@ -17,15 +17,15 @@ export const Disclosure: React.FC<{
   <Collapsible.Root open={open} defaultOpen={defaultOpen} onOpenChange={onOpenChange} className={className}>
     <Collapsible.Trigger
       className={cn(
-        "group flex w-full cursor-pointer items-center gap-2.5 rounded-[4px] text-left outline-none focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-ink",
-        size === "sm" && "text-[13px] text-muted hover:text-ink",
+        "group flex w-full cursor-pointer items-center gap-2.5 rounded-sm text-left outline-hidden focus-visible:outline-2 focus-visible:outline-solid focus-visible:outline-offset-4 focus-visible:outline-ink",
+        size === "sm" && "text-label text-muted hover:text-ink",
       )}
     >
       <span
         aria-hidden
         className={cn(
           "grid flex-none place-items-center transition-transform duration-150 group-data-panel-open:rotate-90",
-          size === "lg" && "size-5 rounded-[4px] border-2 border-ink bg-main",
+          size === "lg" && "size-5 rounded-sm border-2 border-ink bg-main",
         )}
       >
         <ChevronRight className="size-3.5" strokeWidth={3} />

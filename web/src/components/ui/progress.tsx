@@ -5,7 +5,7 @@ import React from "react";
 export const Progress: React.FC<{ value: number | null; label?: string }> = ({ value, label }) => (
   <BaseProgress.Root value={value} aria-label={label}>
     <BaseProgress.Track className="relative h-4 overflow-hidden rounded-full border-2 border-ink bg-white">
-      <BaseProgress.Indicator className="h-full border-r-2 border-ink bg-main bg-[repeating-linear-gradient(-45deg,transparent_0_6px,rgb(17_17_17/0.12)_6px_12px)] transition-[width] duration-500 data-indeterminate:w-1/3 data-indeterminate:animate-slide" />
+      <BaseProgress.Indicator className="h-full border-r-2 border-ink bg-main bg-[repeating-linear-gradient(-45deg,transparent_0_6px,rgb(17_17_17/0.12)_6px_12px)] transition-[width] duration-500 data-indeterminate:w-1/3 data-indeterminate:animate-slide motion-reduce:transition-none motion-reduce:data-indeterminate:w-full motion-reduce:data-indeterminate:animate-none" />
     </BaseProgress.Track>
   </BaseProgress.Root>
 );
