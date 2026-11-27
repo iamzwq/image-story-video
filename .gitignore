@@ -10,4 +10,4 @@ public/episodes/*/storyboard.bak.json
 public/episodes/*/compare/
 public/episodes/
 texts/
-episodes.json
+src/episodes.json
