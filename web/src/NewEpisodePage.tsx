@@ -8,6 +8,7 @@ import {
   buttonClass,
   Card,
   CardTitle,
+  Checkbox,
   Disclosure,
   Field,
   Hint,
@@ -27,6 +28,7 @@ export const NewEpisodePage: React.FC<{ ready: Ready | null; onCreated: () => vo
   const [text, setText] = useState("");
   const [options, setOptions] = useState<StoryboardOptions>(DEFAULT_OPTIONS);
   const [maxCost, setMaxCost] = useState(20);
+  const [noRefs, setNoRefs] = useState(false);
   const [busy, setBusy] = useState(false);
   const [error, setError] = useState("");
   const created = useRef(false);
@@ -61,7 +63,8 @@ export const NewEpisodePage: React.FC<{ ready: Ready | null; onCreated: () => vo
     }
     if (next) {
       try {
-        await request(`/api/episodes/${episode.id}/jobs`, "POST", { kind: next, options: { ...options, maxCost } });
+        const jobOptions = next === "make" ? { ...options, maxCost, noRefs } : { ...options, maxCost };
+        await request(`/api/episodes/${episode.id}/jobs`, "POST", { kind: next, options: jobOptions });
       } catch (e) {
         setFlash(`文案已保存，但没能开始${next === "make" ? "一键生成" : "写分镜"}：${errorText(e)}`);
       }
@@ -160,6 +163,9 @@ export const NewEpisodePage: React.FC<{ ready: Ready | null; onCreated: () => vo
               </Button>
               <CostLimit value={maxCost} onChange={setMaxCost} label="出图费用上限" />
             </div>
+            <Checkbox checked={noRefs} onChange={setNoRefs} disabled={busy}>
+              不带参考图：省钱，人物前后一致性差一些
+            </Checkbox>
             <Hint>
               不用管中间步骤，从分镜一直做到导出。5 分钟的视频大约要 15–30 分钟，出图约 5–10 元；预计超过上限就不出图，不会花钱。
             </Hint>
