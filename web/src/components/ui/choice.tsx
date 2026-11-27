@@ -30,23 +30,26 @@ export const Checkbox: React.FC<{
 export const RadioGroup: React.FC<{
   value: string;
   onChange: (value: string) => void;
+  label?: string;
   className?: string;
   children: React.ReactNode;
-}> = ({ value, onChange, className, children }) => (
-  <BaseRadioGroup value={value} onValueChange={(v) => onChange(v as string)} className={className}>
+}> = ({ value, onChange, label, className, children }) => (
+  <BaseRadioGroup aria-label={label} value={value} onValueChange={(v) => onChange(v as string)} className={className}>
     {children}
   </BaseRadioGroup>
 );
 
-export const Radio: React.FC<{ value: string; className?: string; children: React.ReactNode }> = ({
+export const Radio: React.FC<{ value: string; disabled?: boolean; className?: string; children: React.ReactNode }> = ({
   value,
+  disabled,
   className,
   children,
 }) => (
-  <label className={cn("flex cursor-pointer items-center gap-2", className)}>
+  <label className={cn("flex cursor-pointer items-center gap-2 has-data-disabled:cursor-not-allowed", className)}>
     <BaseRadio.Root
       value={value}
-      className="grid size-5 flex-none cursor-pointer place-items-center rounded-full border-2 border-ink bg-white outline-hidden focus-visible:outline-2 focus-visible:outline-solid focus-visible:outline-offset-2 focus-visible:outline-ink data-checked:bg-main"
+      disabled={disabled}
+      className="grid size-5 flex-none cursor-pointer place-items-center rounded-full border-2 border-ink bg-white outline-hidden focus-visible:outline-2 focus-visible:outline-solid focus-visible:outline-offset-2 focus-visible:outline-ink data-checked:bg-main data-disabled:cursor-not-allowed data-disabled:bg-paper"
     >
       <BaseRadio.Indicator className="size-2 rounded-full bg-ink" />
     </BaseRadio.Root>

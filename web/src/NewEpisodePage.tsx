@@ -1,20 +1,20 @@
-import { AudioLines, FileUp, Save, Sparkles, Zap } from "lucide-react";
+import { AudioLines, Clapperboard, FileText, FileUp, Save, Sparkles, Zap } from "lucide-react";
 import React, { useRef, useState } from "react";
 import type { EpisodeSummary, Ready, StoryboardOptions } from "./api";
 import { errorText, formatElapsed, request, speechSeconds } from "./api";
 import {
   Alert,
   Button,
-  buttonClass,
   Card,
   CardTitle,
   Checkbox,
   Disclosure,
   Field,
-  Hint,
   Input,
   Page,
   PageHeader,
+  Radio,
+  RadioGroup,
   Spinner,
   Textarea,
 } from "./components/ui";
@@ -29,9 +29,12 @@ export const NewEpisodePage: React.FC<{ ready: Ready | null; onCreated: () => vo
   const [options, setOptions] = useState<StoryboardOptions>(DEFAULT_OPTIONS);
   const [maxCost, setMaxCost] = useState(20);
   const [noRefs, setNoRefs] = useState(false);
+  // 推荐先写分镜、看过画面再出图；一键生成适合已经熟悉效果的时候
+  const [mode, setMode] = useState<"storyboard" | "make">("storyboard");
   const [busy, setBusy] = useState(false);
   const [error, setError] = useState("");
   const created = useRef(false);
+  const fileInput = useRef<HTMLInputElement>(null);
   useLeaveGuard(Boolean(title.trim() || subtitle.trim() || text.trim()), () => created.current);
 
   const importFile = async (file: File) => {
@@ -77,15 +80,40 @@ export const NewEpisodePage: React.FC<{ ready: Ready | null; onCreated: () => vo
   const seconds = speechSeconds(text);
   const llmMissing = ready !== null && !ready.llm;
   const imageMissing = ready !== null && !ready.image;
+  const making = mode === "make";
+  const startBlocked = busy || llmMissing || (making && imageMissing);
 
   return (
     <Page>
       <PageHeader
         title="新建视频"
-        subtitle="粘贴口播文案，AI 会把它分成一个个画面、配音、出图，最后导出带字幕的视频。"
+        subtitle="粘贴口播文案，选好配音和画面比例。AI 负责分镜、配音和出图，最后导出带字幕的 MP4。"
       />
-      <div className="grid items-start gap-5 lg:grid-cols-[minmax(0,1.5fr)_minmax(320px,1fr)]">
+      <div className="grid items-start gap-5 lg:grid-cols-[minmax(0,1.5fr)_minmax(340px,1fr)]">
         <Card className="flex flex-col gap-4">
+          <div className="flex flex-wrap items-center justify-between gap-3">
+            <CardTitle className="mb-0">
+              <FileText />
+              文案
+            </CardTitle>
+            <Button size="sm" onClick={() => fileInput.current?.click()}>
+              <FileUp />
+              从文件导入
+            </Button>
+            <input
+              ref={fileInput}
+              type="file"
+              accept=".md,.markdown,.txt,text/plain,text/markdown"
+              hidden
+              onChange={(e) => {
+                const file = e.target.files?.[0];
+                if (file) {
+                  importFile(file);
+                }
+                e.target.value = "";
+              }}
+            />
+          </div>
           <div className="grid gap-4 md:grid-cols-2">
             <Field label="标题" hint="显示在视频顶部和封面上">
               <Input value={title} maxLength={60} placeholder="例如：负荆请罪" onChange={(e) => setTitle(e.target.value)} />
@@ -94,39 +122,21 @@ export const NewEpisodePage: React.FC<{ ready: Ready | null; onCreated: () => vo
               <Input value={subtitle} maxLength={60} onChange={(e) => setSubtitle(e.target.value)} />
             </Field>
           </div>
-          <Field
-            label="文案"
-            hint={
-              text.trim()
-                ? `${text.length} 字，配音大约 ${formatElapsed(seconds)}`
-                : "纯文字或 Markdown 都可以，格式符号、网址、Emoji 不会读出来"
-            }
-          >
-            <Textarea
-              className="min-h-86 text-reading"
-              value={text}
-              rows={18}
-              placeholder={"战国时期，赵国有两位名臣……\n\n## 第一章：完璧归赵\n（用 ## 小标题或「第一章：……」分章节，会显示章节卡）"}
-              onChange={(e) => setText(e.target.value)}
-            />
-          </Field>
-          <div>
-            <label className={buttonClass()}>
-              <FileUp />
-              从文件导入（.md / .txt）
-              <input
-                type="file"
-                accept=".md,.markdown,.txt,text/plain,text/markdown"
-                hidden
-                onChange={(e) => {
-                  const file = e.target.files?.[0];
-                  if (file) {
-                    importFile(file);
-                  }
-                  e.target.value = "";
-                }}
+          <div className="relative">
+            {text.trim() ? (
+              <span className="absolute top-0 right-0 text-label font-semibold text-muted">
+                {text.length} 字 · 配音约 {formatElapsed(seconds)}
+              </span>
+            ) : null}
+            <Field label="正文" hint="纯文字或 Markdown 都可以，格式符号、网址、Emoji 不会读出来">
+              <Textarea
+                className="min-h-86 text-reading"
+                value={text}
+                rows={16}
+                placeholder={"战国时期，赵国有两位名臣……\n\n## 第一章：完璧归赵\n（用 ## 小标题或「第一章：……」分章节，会显示章节卡）"}
+                onChange={(e) => setText(e.target.value)}
               />
-            </label>
+            </Field>
           </div>
           <Disclosure title="什么样的文案适合？" size="sm">
             <ul className="flex list-disc flex-col gap-1.5 pl-5 text-muted marker:text-ink">
@@ -146,43 +156,75 @@ export const NewEpisodePage: React.FC<{ ready: Ready | null; onCreated: () => vo
           </Disclosure>
         </Card>
 
-        <Card className="flex flex-col gap-4">
-          <CardTitle className="mb-0"><AudioLines />配音和画面</CardTitle>
-          <StoryboardOptionsForm value={options} onChange={setOptions} compact />
-          <div className="h-0.5 bg-ink" />
-          <div className="flex flex-col gap-2.5">
-            <Button variant="primary" block disabled={busy || llmMissing} onClick={() => create("storyboard")}>
-              {busy ? <Spinner /> : <Sparkles />}
-              保存并让 AI 写分镜
+        <div className="flex flex-col gap-5">
+          <Card className="flex flex-col gap-4">
+            <CardTitle className="mb-0">
+              <AudioLines />
+              配音和画面
+            </CardTitle>
+            <StoryboardOptionsForm value={options} onChange={setOptions} compact />
+          </Card>
+
+          <Card className="flex flex-col gap-4">
+            <CardTitle className="mb-0">
+              <Clapperboard />
+              开始制作
+            </CardTitle>
+            <RadioGroup
+              label="制作方式"
+              value={mode}
+              onChange={(v) => setMode(v as "storyboard" | "make")}
+              className="grid gap-2.5"
+            >
+              <Radio value="storyboard" className={modeTile}>
+                <span className="flex flex-col gap-0.5">
+                  <strong className="font-black">先写分镜（推荐）</strong>
+                  <span className="text-label text-muted">先看画面描述、试画几张，满意再全部出图。约 1–3 分钟。</span>
+                </span>
+              </Radio>
+              <Radio value="make" disabled={imageMissing} className={modeTile}>
+                <span className="flex flex-col gap-0.5">
+                  <strong className="font-black">一键生成</strong>
+                  <span className="text-label text-muted">从分镜一直做到导出。5 分钟的视频约 15–30 分钟、出图 5–10 元。</span>
+                </span>
+              </Radio>
+            </RadioGroup>
+            {making ? (
+              <div className="flex flex-col gap-3 border-l-4 border-ink pl-3.5">
+                <CostLimit
+                  value={maxCost}
+                  onChange={setMaxCost}
+                  label="出图费用上限"
+                  note="（预计超过就不出图，不会花钱）"
+                />
+                <Checkbox checked={noRefs} onChange={setNoRefs} disabled={busy}>
+                  不带参考图：省钱，人物前后一致性差一些
+                </Checkbox>
+              </div>
+            ) : null}
+            <Button variant="primary" block disabled={startBlocked} onClick={() => create(mode)}>
+              {busy ? <Spinner /> : making ? <Zap /> : <Sparkles />}
+              {making ? "保存并一键生成" : "保存并写分镜"}
             </Button>
-            <Hint>推荐：写好分镜后先看一遍画面描述、试画几张图，满意了再全部生成。写分镜通常 1–3 分钟。</Hint>
-            <div className="mt-2 flex flex-wrap items-center gap-3">
-              <Button className="flex-1" disabled={busy || llmMissing || imageMissing} onClick={() => create("make")}>
-                <Zap />
-                一键生成视频
-              </Button>
-              <CostLimit value={maxCost} onChange={setMaxCost} label="出图费用上限" />
-            </div>
-            <Checkbox checked={noRefs} onChange={setNoRefs} disabled={busy}>
-              不带参考图：省钱，人物前后一致性差一些
-            </Checkbox>
-            <Hint>
-              不用管中间步骤，从分镜一直做到导出。5 分钟的视频大约要 15–30 分钟，出图约 5–10 元；预计超过上限就不出图，不会花钱。
-            </Hint>
-            <Button variant="link" className="self-start" disabled={busy} onClick={() => create(null)}>
+            <Button variant="link" className="self-center" disabled={busy} onClick={() => create(null)}>
               <Save />
-              只保存文案
+              只保存文案，稍后再做
             </Button>
-          </div>
-          {llmMissing || imageMissing ? (
-            <Alert tone="warn">
-              {llmMissing ? "还没有填写大模型设置，没法写分镜。" : `还不能出图：${ready?.imageError}`}{" "}
-              <SettingsLink />
-            </Alert>
-          ) : null}
-          {error ? <Alert tone="error">{error}</Alert> : null}
-        </Card>
+            {llmMissing || imageMissing ? (
+              <Alert tone="warn">
+                {llmMissing ? "还没有填写大模型设置，没法写分镜。" : `还不能出图，所以一键生成用不了：${ready?.imageError}`}{" "}
+                <SettingsLink />
+              </Alert>
+            ) : null}
+            {error ? <Alert tone="error">{error}</Alert> : null}
+          </Card>
+        </div>
       </div>
     </Page>
   );
 };
+
+// 制作方式的选项卡片：选中的那张填浅主色、带投影
+const modeTile =
+  "items-start gap-3 rounded-base border-2 border-ink bg-white p-3 transition-[background-color,box-shadow] duration-100 motion-reduce:transition-none " +
+  "hover:bg-main-soft has-data-checked:bg-main-soft has-data-checked:shadow-brutal-sm has-data-disabled:opacity-55 has-data-disabled:hover:bg-white [&>button]:mt-0.5";
