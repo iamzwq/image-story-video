@@ -1,7 +1,7 @@
 import { AudioLines, Clapperboard, FileText, FileUp, Save, Sparkles, Zap } from "lucide-react";
 import React, { useRef, useState } from "react";
 import type { EpisodeSummary, Ready, StoryboardOptions } from "./api";
-import { errorText, formatElapsed, request, speechSeconds } from "./api";
+import { errorText, formatElapsed, request, speakableChars, speechSeconds } from "./api";
 import {
   Alert,
   Button,
@@ -77,7 +77,7 @@ export const NewEpisodePage: React.FC<{ ready: Ready | null; onCreated: () => vo
     navigate(`/ep/${episode.id}`);
   };
 
-  const seconds = speechSeconds(text);
+  const seconds = speechSeconds(text, options.rate);
   const llmMissing = ready !== null && !ready.llm;
   const imageMissing = ready !== null && !ready.image;
   const making = mode === "make";
@@ -125,7 +125,7 @@ export const NewEpisodePage: React.FC<{ ready: Ready | null; onCreated: () => vo
           <div className="relative">
             {text.trim() ? (
               <span className="absolute top-0 right-0 text-label font-semibold text-muted">
-                {text.length} 字 · 配音约 {formatElapsed(seconds)}
+                {speakableChars(text)} 字 · 配音约 {formatElapsed(seconds)}
               </span>
             ) : null}
             <Field label="正文" hint="纯文字或 Markdown 都可以，格式符号、网址、Emoji 不会读出来">

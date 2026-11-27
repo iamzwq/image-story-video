@@ -169,5 +169,14 @@ export const formatTime = (epochSeconds: number) =>
     minute: "2-digit",
   });
 
-/** 中文口播大约每秒 4.5 个字 */
-export const speechSeconds = (text: string) => (text.match(/[\p{L}\p{N}]/gu)?.length ?? 0) / 4.5;
+/** 会读出来的字：汉字、字母、数字，不算标点、空格和 Markdown 符号 */
+export const speakableChars = (text: string) => text.match(/[\p{L}\p{N}]/gu)?.length ?? 0;
+
+// 用已经做好的几集校准：+5% 语速时实际约每秒 4.5 个字（含开场和章节停顿），折算成正常语速约 4.3
+const CHARS_PER_SECOND = 4.3;
+
+/** 估算配音时长。rate 是配音语速，例如 "+5%"、"-10%" */
+export const speechSeconds = (text: string, rate = "+0%") => {
+  const percent = Number.parseFloat(rate) || 0;
+  return speakableChars(text) / (CHARS_PER_SECOND * (1 + percent / 100));
+};
