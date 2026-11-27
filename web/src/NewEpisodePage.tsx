@@ -114,30 +114,28 @@ export const NewEpisodePage: React.FC<{ ready: Ready | null; onCreated: () => vo
               }}
             />
           </div>
-          <div className="grid gap-4 md:grid-cols-2">
-            <Field label="标题" hint="显示在视频顶部和封面上">
+          <div className="grid items-end gap-4 md:grid-cols-2">
+            <Field label="标题" hint="显示在视频顶部和封面上" hintInline>
               <Input value={title} maxLength={60} placeholder="例如：负荆请罪" onChange={(e) => setTitle(e.target.value)} />
             </Field>
-            <Field label="副标题（可不填）" hint="开场时显示在标题下面">
+            <Field label="副标题" hint="可不填，开场时显示在标题下面" hintInline>
               <Input value={subtitle} maxLength={60} onChange={(e) => setSubtitle(e.target.value)} />
             </Field>
           </div>
-          <div className="relative">
-            {text.trim() ? (
-              <span className="absolute top-0 right-0 text-label font-semibold text-muted">
-                {speakableChars(text)} 字 · 配音约 {formatElapsed(seconds)}
-              </span>
-            ) : null}
-            <Field label="正文" hint="纯文字或 Markdown 都可以，格式符号、网址、Emoji 不会读出来">
-              <Textarea
-                className="min-h-86 text-reading"
-                value={text}
-                rows={16}
-                placeholder={"战国时期，赵国有两位名臣……\n\n## 第一章：完璧归赵\n（用 ## 小标题或「第一章：……」分章节，会显示章节卡）"}
-                onChange={(e) => setText(e.target.value)}
-              />
-            </Field>
-          </div>
+          <Field
+            label="正文"
+            hint="纯文字或 Markdown，格式符号不会读出来"
+            hintInline
+            aside={text.trim() ? `${speakableChars(text)} 字 · 配音约 ${formatElapsed(seconds)}` : null}
+          >
+            <Textarea
+              className="min-h-86 text-reading"
+              value={text}
+              rows={16}
+              placeholder={"战国时期，赵国有两位名臣……\n\n## 第一章：完璧归赵\n（用 ## 小标题或「第一章：……」分章节，会显示章节卡）"}
+              onChange={(e) => setText(e.target.value)}
+            />
+          </Field>
           <Disclosure title="什么样的文案适合？" size="sm">
             <ul className="flex list-disc flex-col gap-1.5 pl-5 text-muted marker:text-ink">
               <li>
